@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -28,8 +29,8 @@ import java.util.List;
 public class FragRight extends Fragment {
     private ListView lvApps;
     private PackageManager packMan;
-    private ArrayList<AppInfo> arrAppInfo=new ArrayList<>();
     private AppsLvAdapter alAdapter;
+    private ArrayList<AppInfo> arrAppInfo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,9 @@ public class FragRight extends Fragment {
         // Inflate the layout for this fragment
         View fRview=inflater.inflate(R.layout.frag_right_fragment, container, false);
         initViews(fRview);
-        getInstalledApps();
+        packMan=this.getActivity().getPackageManager();
+        //getInstalledApps();
+        getStartableApps();
         setAppsToList();
 
         return fRview;
@@ -55,7 +58,7 @@ public class FragRight extends Fragment {
 
     private void getInstalledApps()
     {
-        packMan=this.getActivity().getPackageManager();
+
         List<PackageInfo> packages=packMan.getInstalledPackages(0);
 
         for(PackageInfo pi:packages)
@@ -64,16 +67,34 @@ public class FragRight extends Fragment {
                     //    && (pi.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)     //用户应用
             {
                 Log.i("app_user",pi.packageName);
-                String namea=pi.applicationInfo.loadLabel(packMan).toString();
-                String namepack=pi.packageName;
-                AppInfo aIn=new AppInfo(namea,namepack);
-                arrAppInfo.add(aIn);
+//                String namea=pi.applicationInfo.loadLabel(packMan).toString();
+//                String namepack=pi.packageName;
+//                AppInfo aIn=new AppInfo(namea,namepack);
+//                arrAppInfo.add(aIn);
             }
             else
                 Log.i("app_sys",pi.packageName);
         }
+    }
 
-        Log.i("length1",arrAppInfo.size()+"");
+    private void getStartableApps()
+    {
+        arrAppInfo=new ArrayList<>();
+
+        Intent startupIntent = new Intent(Intent.ACTION_MAIN);
+
+        startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        //final PackageManager packageManager = getActivity().getPackageManager();
+        List<ResolveInfo> startApps = packMan.queryIntentActivities(startupIntent,0);
+        for(ResolveInfo ri:startApps)
+        {
+
+            String namea=ri.loadLabel(packMan).toString();
+            String namepack=ri.activityInfo.packageName;
+            AppInfo aIn=new AppInfo(namea,namepack);
+            arrAppInfo.add(aIn);
+        }
+        Log.i("startable","length:"+arrAppInfo.size());
     }
 
     private void setAppsToList()
