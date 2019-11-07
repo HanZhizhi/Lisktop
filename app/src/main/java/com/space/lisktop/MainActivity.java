@@ -8,6 +8,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.ListView;
 
 import com.space.lisktop.activities.FragLeft;
@@ -83,4 +84,11 @@ public class MainActivity extends FragmentActivity {
         });
     }
 
+    @Override
+    //屏蔽返回按键
+    public boolean onKeyDown(int keyCode,KeyEvent event) {
+        if(keyCode== KeyEvent.KEYCODE_BACK)
+            return true;//不执行父类点击事件
+        return super.onKeyDown(keyCode, event);
+    }
 }

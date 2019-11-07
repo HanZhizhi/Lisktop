@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FragRight extends Fragment {
-    private TextView tv1;
     private ListView lvApps;
     private PackageManager packMan;
     private ArrayList<AppInfo> arrAppInfo=new ArrayList<>();
@@ -46,14 +45,11 @@ public class FragRight extends Fragment {
         getInstalledApps();
         setAppsToList();
 
-
-        tv1.setText("右边的外星人");
         return fRview;
     }
 
     private void initViews(View rootView)
     {
-        tv1=rootView.findViewById(R.id.frag_right_tv);
         lvApps=rootView.findViewById(R.id.installed_apps);
     }
 
