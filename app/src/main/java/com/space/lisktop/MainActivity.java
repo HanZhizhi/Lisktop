@@ -1,14 +1,18 @@
 package com.space.lisktop;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ListView;
 
 import com.space.lisktop.activities.FragLeft;
@@ -30,14 +34,19 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(Window.FEATURE_NO_TITLE,Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.hide();
+//        }
 
         fragManager=getSupportFragmentManager();
 
         initViews();
 
         pManager=getPackageManager();
-
     }
 
     private void initViews()
@@ -89,6 +98,8 @@ public class MainActivity extends FragmentActivity {
     public boolean onKeyDown(int keyCode,KeyEvent event) {
         if(keyCode== KeyEvent.KEYCODE_BACK)
             return true;//不执行父类点击事件
+        if (keyCode==KeyEvent.KEYCODE_HOME)
+            return true;
         return super.onKeyDown(keyCode, event);
     }
 }

@@ -11,47 +11,69 @@
         android:layout_height="wrap_content"
         android:paddingLeft="20dp">
 
-        <TextClock
-            android:id="@+id/clock_time"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:format24Hour="HH:mm"
-            android:format12Hour="hh:mm"
-            android:textSize="40dp"
-            android:textColor="#010101"/>
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-        <TextClock
-            android:id="@+id/clock_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/clock_time"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="8dp"
-            android:format24Hour="MM-dd EE"
-            android:format12Hour="MM-dd EE"
-            android:textSize="22dp"
-            android:textColor="#789323" />
+            <TextClock
+                android:id="@+id/clock_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:format24Hour="HH:mm"
+                android:format12Hour="hh:mm"
+                android:textSize="40dp"
+                android:textColor="#010101"/>
+
+            <TextClock
+                android:id="@+id/clock_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/clock_time"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="8dp"
+                android:layout_centerHorizontal="true"
+                android:format24Hour="MM-dd EE"
+                android:format12Hour="MM-dd EE"
+                android:textSize="18dp"
+                android:textColor="#789323" />
+
+        </RelativeLayout>
 
         <TextView
+            android:id="@+id/tvSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/clock_time"
-            android:layout_marginLeft="30dp"
             android:layout_centerVertical="true"
-            android:gravity="center_horizontal"
-            android:text="哈哈哈！！"
-            android:textColor="#372988"
-            android:textSize="34dp" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="20dp"
+            android:text="设置" />
 
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"/>
 
-    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#dddddd">
+
+        <LinearLayout
+            android:id="@+id/llayout_mainApps"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+        </LinearLayout>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

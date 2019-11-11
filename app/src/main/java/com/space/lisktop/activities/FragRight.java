@@ -2,6 +2,7 @@ package com.space.lisktop.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,13 +24,17 @@ import android.widget.TextView;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
 import com.space.lisktop.obj.AppInfo;
+import com.space.lisktop.utility.PackageManageHelper;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class FragRight extends Fragment {
+    private PackageManager packageManager;
     private ListView lvApps;
-    private PackageManager packMan;
     private AppsLvAdapter alAdapter;
     private ArrayList<AppInfo> arrAppInfo;
 
@@ -43,9 +49,11 @@ public class FragRight extends Fragment {
         // Inflate the layout for this fragment
         View fRview=inflater.inflate(R.layout.frag_right_fragment, container, false);
         initViews(fRview);
-        packMan=this.getActivity().getPackageManager();
-        //getInstalledApps();
-        getStartableApps();
+        packageManager=this.getActivity().getPackageManager();
+        //TODO :获取（排序的）应用显示列表，当前直接packagemanager读取，改为读数据库
+        //获取应用列表
+        arrAppInfo= new PackageManageHelper(getActivity()).getStartableApps(true);
+        //适配至ListView
         setAppsToList();
 
         return fRview;
@@ -56,58 +64,48 @@ public class FragRight extends Fragment {
         lvApps=rootView.findViewById(R.id.installed_apps);
     }
 
-    private void getInstalledApps()
-    {
-
-        List<PackageInfo> packages=packMan.getInstalledPackages(0);
-
-        for(PackageInfo pi:packages)
-        {
-            if((pi.applicationInfo.flags&ApplicationInfo.FLAG_SYSTEM)==0)
-                    //    && (pi.applicationInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0)     //用户应用
-            {
-                Log.i("app_user",pi.packageName);
-//                String namea=pi.applicationInfo.loadLabel(packMan).toString();
-//                String namepack=pi.packageName;
-//                AppInfo aIn=new AppInfo(namea,namepack);
-//                arrAppInfo.add(aIn);
-            }
-            else
-                Log.i("app_sys",pi.packageName);
-        }
-    }
-
-    private void getStartableApps()
-    {
-        arrAppInfo=new ArrayList<>();
-
-        Intent startupIntent = new Intent(Intent.ACTION_MAIN);
-
-        startupIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        //final PackageManager packageManager = getActivity().getPackageManager();
-        List<ResolveInfo> startApps = packMan.queryIntentActivities(startupIntent,0);
-        for(ResolveInfo ri:startApps)
-        {
-
-            String namea=ri.loadLabel(packMan).toString();
-            String namepack=ri.activityInfo.packageName;
-            AppInfo aIn=new AppInfo(namea,namepack);
-            arrAppInfo.add(aIn);
-        }
-        Log.i("startable","length:"+arrAppInfo.size());
-    }
-
     private void setAppsToList()
     {
-        alAdapter=new AppsLvAdapter(arrAppInfo,getContext());
+        // 获取系统设置判断是否显示应用图标
+        SharedPreferences sPref=PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Log.i("leftshowicon","show:"+sPref.getBoolean("showicon",false));
+        boolean if_show_icons=sPref.getBoolean("showicon",false);
+
+        alAdapter=new AppsLvAdapter(arrAppInfo,getContext(),if_show_icons);
         lvApps.setAdapter(alAdapter);
         lvApps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent=packMan.getLaunchIntentForPackage(arrAppInfo.get(position).getPackageName());
+                Intent intent=packageManager.getLaunchIntentForPackage(arrAppInfo.get(position).getPackageName());
                 startActivity(intent);
+                reArrangeApps(position,arrAppInfo.get(position).getPackageName());
             }
         });
+    }
+
+    // 传入当前打开的序号及包名，以便进一步操作
+    private void reArrangeApps(int arg,String pack)
+    {
+        AppInfo aIfo=arrAppInfo.get(arg);
+        String packageName=arrAppInfo.get(arg).getPackageName();
+        if (packageName.equals(pack))     //验证
+        {
+            //Log.i("length","before remove"+arrAppInfo.size());
+            arrAppInfo.remove(arrAppInfo.get(arg));
+            //Log.i("length","after remove"+arrAppInfo.size());
+            //Log.i("length","before add"+arrAppInfo.size()+arrAppInfo.get(0).getAppName());
+            arrAppInfo.add(0,aIfo);
+            //Log.i("length","after add"+arrAppInfo.size()+arrAppInfo.get(0).getAppName());
+            alAdapter.notifyDataSetChanged();
+            //TODO:以上为LRU实现，改为读写数据库实现分类控制
+        }
+
+    }
+
+    @Override
+    public void onResume() {
+        setAppsToList();
+        super.onResume();
     }
 
     @Override

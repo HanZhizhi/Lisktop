@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lisktop</string>
+
+    <string name="settings_display">显示</string>
+    <string name="title_activity_settings">设置</string>
+
+    <!-- 设置相关-->
+    <string name="show_icon">显示应用图标</string>
+    <string name="icon_summ_on">已显示图标</string>
+    <string name="icon_summ_off">已关闭图标显示</string>
+</resources>

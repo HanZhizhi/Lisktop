@@ -13,23 +13,45 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!-- Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713
+        <activity android:name=".activities.ChooseMainActivity" android:excludeFromRecents="true" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:excludeFromRecents="true"/>
+        <!--
+         Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713
         使用谷歌mob ad API时必须设置，可在app gradle取消
         创建广告ID：https://admob.google.com/home/
         广告API接入手册：https://developers.google.cn/admob/unity/start
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="[ADMOB_APP_ID]"/>-->
-
-        <activity android:name=".MainActivity" android:launchMode="singleInstance" android:excludeFromRecents="true">
+            android:value="[ADMOB_APP_ID]"/>
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
+        </activity> <!-- 定义广播接收器 -->
+        <receiver android:name=".bcastreceiver.packInfoReceiver">
+            <intent-filter>
 
+                <!-- 应用安装了 -->
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <!-- 应用卸载了 -->
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <!-- 应用被覆盖了 -->
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

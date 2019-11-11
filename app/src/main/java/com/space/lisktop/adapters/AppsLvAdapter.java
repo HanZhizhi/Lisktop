@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.space.lisktop.R;
@@ -16,11 +17,13 @@ import java.util.ArrayList;
 public class AppsLvAdapter extends BaseAdapter {
     private ArrayList<AppInfo> infoList;
     private LayoutInflater inflater;
+    private boolean showIcon;   //是否显示图标
 
-    public AppsLvAdapter(ArrayList<AppInfo> info, Context ctx)
+    public AppsLvAdapter(ArrayList<AppInfo> info, Context ctx,boolean shIcon)
     {
         this.infoList=info;
         this.inflater=LayoutInflater.from(ctx);
+        this.showIcon=shIcon;
     }
 
     @Override
@@ -42,15 +45,18 @@ public class AppsLvAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view=inflater.inflate(R.layout.app_item_layout,null);
         TextView tvAppName=view.findViewById(R.id.list_app_name);
+        ImageView icon=view.findViewById(R.id.image_icon);
 
         final AppInfo aInfo= (AppInfo) getItem(position);
         tvAppName.setText(aInfo.getAppName());
-//        tvAppName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
+
+        if (showIcon)
+        {
+            icon.setVisibility(View.VISIBLE);
+            icon.setImageDrawable(aInfo.getAppIcon());
+        }
+        else
+            icon.setVisibility(View.GONE);
 
         return view;
     }
