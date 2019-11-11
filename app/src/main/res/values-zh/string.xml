@@ -4,9 +4,12 @@
 
     <string name="settings_display">显示</string>
     <string name="title_activity_settings">设置</string>
+    <string name="left_word">人生得意须尽欢</string>
+    <string name="settings_choose_mainApp">选择主页应用</string>
 
     <!-- 设置相关-->
     <string name="show_icon">显示应用图标</string>
     <string name="icon_summ_on">已显示图标</string>
     <string name="icon_summ_off">已关闭图标显示</string>
+    <string name="set_motto">设置桌面格言</string>
 </resources>

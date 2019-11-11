@@ -27,6 +27,11 @@
             android:summaryOn="@string/icon_summ_on"
             android:summaryOff="@string/icon_summ_off"/>
 
+        <EditTextPreference
+            android:key="motto"
+            android:title="@string/set_motto"
+            />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
