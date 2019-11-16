@@ -77,15 +77,20 @@
 
     </RelativeLayout>
 
+    <!-- 内外layout的宽高设为wraap_content，根据图标大小调整间距 -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="wrap_content"
         android:background="#eeeeee">
 
         <LinearLayout
             android:id="@+id/llayout_mainApps"
             android:layout_width="wrap_content"
-            android:layout_height="80dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:layout_centerHorizontal="true"
             android:orientation="horizontal"
             android:gravity="center_vertical">
