@@ -42,7 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         btChooseMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SettingsActivity.this,ChooseMainActivity.class));
+                startActivity(new Intent(SettingsActivity.this, ChooseDockActivity.class));
             }
         });
     }

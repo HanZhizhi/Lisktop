@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
+import com.space.lisktop.bcastreceiver.AppClickBroadcastReceiver;
 import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.utility.PackageManageHelper;
 
@@ -76,9 +77,23 @@ public class FragRight extends Fragment {
         lvApps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent=packageManager.getLaunchIntentForPackage(arrAppInfo.get(position).getPackageName());
+                //TODO:改为appclickservice中统一处理(回左页，reArrange，写数据库)
+                String packName=arrAppInfo.get(position).getPackageName();
+                Intent intent=packageManager.getLaunchIntentForPackage(packName);
                 startActivity(intent);
-                reArrangeApps(position,arrAppInfo.get(position).getPackageName());
+
+//                Intent AppClickIntent=new Intent();
+//                Bundle acBundle=new Bundle();
+//                acBundle.putString("appPackName",packName);       //传入包名称进行后续操作
+//                AppClickIntent.putExtras(acBundle);
+//                getActivity().startService(AppClickIntent);
+
+                Intent clickIntent=new Intent(getActivity(), AppClickBroadcastReceiver.class);
+                clickIntent.setAction("APP_CLICK_ACTION");
+                clickIntent.putExtra("package_name",packName);
+                getActivity().sendBroadcast(clickIntent,"com.space.lisktop.permission_app_click");
+
+                reArrangeApps(position,packName);
             }
         });
     }

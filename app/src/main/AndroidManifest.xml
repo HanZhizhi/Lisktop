@@ -3,7 +3,9 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.space.lisktop">
 
-    <dist:module dist:instant="true" />
+    <dist:module dist:instant="true" /> <!-- 自定义权限 -->
+    <permission android:name="com.space.lisktop.permission_app_click" /> <!-- 添加自定义的权限 -->
+    <uses-permission android:name="com.space.lisktop.permission_app_click" />
 
     <application
         android:allowBackup="true"
@@ -12,12 +14,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".activities.ChooseMainActivity" android:excludeFromRecents="true" />
+        <activity android:name=".activities.WelActivity"></activity>
+        <activity
+            android:name=".activities.ChooseDockActivity"
+            android:excludeFromRecents="true" />
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:excludeFromRecents="true"/>
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_settings" />
         <!--
          Sample AdMob App ID: ca-app-pub-3940256099942544~3347511713
         使用谷歌mob ad API时必须设置，可在app gradle取消
@@ -39,7 +43,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity> <!-- 定义广播接收器 -->
-        <receiver android:name=".bcastreceiver.packInfoReceiver"
+        <receiver
+            android:name=".bcastreceiver.packInfoReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -50,12 +55,24 @@
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
                 <!-- 应用被覆盖了 -->
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
-
-                <action android:name="hahaTest"/>
+                <action android:name="hahaTest" />
 
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".bcastreceiver.AppClickBroadcastReceiver">
+            <intent-filter>
+                <action android:name="APP_CLICK_ACTION" />
+            </intent-filter>
+        </receiver>
+        <!--
+<receiver android:name=".bcastreceiver.HomePressBReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.CLOSE_SYSTEM_DIALOGS"/>
+            </intent-filter>
+        </receiver>
+        -->
+        <service android:name=".services.AppClickedService" />
     </application>
 
 </manifest>

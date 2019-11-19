@@ -31,7 +31,6 @@ import com.space.lisktop.bcastreceiver.TimeReceiver;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.utility.LisktopDAO;
-import com.space.lisktop.utility.PackageManageHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -145,7 +144,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
 
         tvMotto=rootV.findViewById(R.id.left_motto);
         sPref= PreferenceManager.getDefaultSharedPreferences(context);
-        tvMotto.setText(sPref.getString("motto","error!"));
+        tvMotto.setText(sPref.getString("motto","哈哈哈!"));
     }
 
     @Override
@@ -156,14 +155,15 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    //TODO:onResume需要大改
     public void onResume() {
-        tvMotto.setText(sPref.getString("motto","error!"));
+        tvMotto.setText(sPref.getString("motto","HaHaHa!"));
 
         lisktopDAO =new LisktopDAO(context);
         //无选择的主页应用，跳至选择页面
         if (!lisktopDAO.isDataExist())
         {
-            Intent chsIntent=new Intent(context,ChooseMainActivity.class);
+            Intent chsIntent=new Intent(context, ChooseDockActivity.class);
             startActivity(chsIntent);
         }
         else {      //有选择的主页应用，查找数据库并显示
@@ -177,9 +177,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
                 layoutMainApps.removeView(layoutMainApps.getChildAt(0));           //原为getChildAt(i)，改为一直删除第0个
             }
             addMainApp(mainApps);
-            //for (int i=0;i<mainApps.size();i++){
-                //addMainApp1(mainApps.get(i),i);
-            //}
         }
         super.onResume();
     }
@@ -265,6 +262,8 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        context.unregisterReceiver(timeChangeReceiver);
+        if (timeChangeReceiver!=null){
+            context.unregisterReceiver(timeChangeReceiver);
+        }
     }
 }

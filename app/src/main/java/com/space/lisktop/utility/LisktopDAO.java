@@ -47,6 +47,9 @@ public class LisktopDAO {
                     if (count>0)
                         return true;
                 }
+                else {
+                    Log.i("count",count+"else");
+                }
             }
             catch (Exception E)
             {

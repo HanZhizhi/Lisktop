@@ -23,11 +23,31 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="9b19798a-659f-4a0d-8893-5be8c784ad02">
+        <schema name="main" object-types="view, table" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="9b19798a-659f-4a0d-8893-5be8c784ad02">
-      <console name="lisktop" type="STANDARD" schema="main" session="Main"><![CDATA[select * from mainApps]]></console>
+      <console name="table_click" type="STANDARD" schema="main" session="Main"><![CDATA[create table app_usage(
+id integer primary key autoincrement unique,
+clicked_app integer,
+click_time datetime,
+foreign key(clicked_app) references userApp(app_id)
+)]]></console>
+      <console name="table_userapp" type="STANDARD" schema="main" session="Main"><![CDATA[drop table userApp
+create table userApp (app_id integer primary key autoincrement unique, 
+package_name text,
+app_name text,
+app_icon blob,
+app_alias text,
+is_dock_app int8,
+app_right_index integer,
+app_priority integer ,
+app_cur_click integer
+)]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
@@ -37,6 +57,7 @@
     <connection id="9b19798a-659f-4a0d-8893-5be8c784ad02" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="9b19798a-659f-4a0d-8893-5be8c784ad02" dataset="main.userApp" active-filter-id="" />
     <filter-actions connection-id="9b19798a-659f-4a0d-8893-5be8c784ad02" dataset="main.mainApps" active-filter-id="" />
     <filter-actions connection-id="9b19798a-659f-4a0d-8893-5be8c784ad02" dataset="main.android_metadata" active-filter-id="" />
   </component>

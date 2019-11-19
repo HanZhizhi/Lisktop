@@ -1,21 +1,20 @@
 package com.space.lisktop.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.ViewPager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.space.lisktop.MainActivity;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
 import com.space.lisktop.obj.AppInfo;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class ChooseMainActivity extends AppCompatActivity  implements View.OnClickListener {
+public class ChooseDockActivity extends AppCompatActivity  implements View.OnClickListener {
     private ListView lvApps;
     private Button btOK;
     private LinearLayout llSeled;   //显示已选应用
@@ -64,7 +63,7 @@ public class ChooseMainActivity extends AppCompatActivity  implements View.OnCli
                     numSelected+=1;
                 }
                 else
-                    Toast.makeText(ChooseMainActivity.this,"最多五个哦~", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChooseDockActivity.this,"最多五个哦~", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -112,6 +111,7 @@ public class ChooseMainActivity extends AppCompatActivity  implements View.OnCli
                     lisktopDAO.deleteTable();
                     boolean sus=lisktopDAO.writeMainApps(selApps);
                     Log.i("write","sucsess:"+sus);
+                    startActivity(new Intent(this, MainActivity.class));
                     finish();
                 }
                 else {
@@ -134,7 +134,7 @@ public class ChooseMainActivity extends AppCompatActivity  implements View.OnCli
                 // TODO:可以将线性布局中添加图片改为列表
                 selApps.remove(selApps.get(idx));
                 numSelected-=1;
-                Toast.makeText(ChooseMainActivity.this,"选择个数："+selApps.size()+llSeled.getChildCount(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChooseDockActivity.this,"选择个数："+selApps.size()+llSeled.getChildCount(), Toast.LENGTH_SHORT).show();
                 break;
         }
     }
