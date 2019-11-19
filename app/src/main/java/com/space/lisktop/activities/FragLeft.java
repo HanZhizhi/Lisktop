@@ -159,25 +159,21 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     public void onResume() {
         tvMotto.setText(sPref.getString("motto","HaHaHa!"));
 
+
         lisktopDAO =new LisktopDAO(context);
-        //无选择的主页应用，跳至选择页面
-        if (!lisktopDAO.isDataExist())
+        mainApps=lisktopDAO.getMainApps();
+        //删除原有图标添加新的
+        Log.i("childs",layoutMainApps.getChildCount()+"");
+        int numChilds=layoutMainApps.getChildCount();
+        for (int i=0;i<numChilds;i++)      //原本将getChildCount写在循环中，导致循环上届改变，子view未删完
         {
-            Intent chsIntent=new Intent(context, ChooseDockActivity.class);
-            startActivity(chsIntent);
+            Log.i("todeleteview",i+"--"+layoutMainApps.getChildAt(0).getId());
+            layoutMainApps.removeView(layoutMainApps.getChildAt(0));           //原为getChildAt(i)，改为一直删除第0个
         }
-        else {      //有选择的主页应用，查找数据库并显示
-            mainApps=lisktopDAO.getMainApps();
-            //删除原有图标添加新的
-            Log.i("childs",layoutMainApps.getChildCount()+"");
-            int numChilds=layoutMainApps.getChildCount();
-            for (int i=0;i<numChilds;i++)      //原本将getChildCount写在循环中，导致循环上届改变，子view未删完
-            {
-                Log.i("todeleteview",i+"--"+layoutMainApps.getChildAt(0).getId());
-                layoutMainApps.removeView(layoutMainApps.getChildAt(0));           //原为getChildAt(i)，改为一直删除第0个
-            }
+        if(mainApps.size() > 0){
             addMainApp(mainApps);
         }
+
         super.onResume();
     }
 
