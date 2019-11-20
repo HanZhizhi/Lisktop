@@ -2,6 +2,7 @@ package com.space.lisktop.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -10,9 +11,12 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +28,7 @@ import android.widget.TextView;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
 import com.space.lisktop.bcastreceiver.AppClickBroadcastReceiver;
+import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.utility.PackageManageHelper;
 
@@ -39,9 +44,26 @@ public class FragRight extends Fragment {
     private AppsLvAdapter alAdapter;
     private ArrayList<AppInfo> arrAppInfo;
 
+    private packInfoReceiver piRec;       //监听应用安装卸载
+    public static Handler appHandler;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        appHandler=new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case 0:
+                        Log.i("right handler","receive msg 0");
+                        //TODO:改为数据库时通过intent获取包信息，只更改获取arrAppInfo的方法
+                        arrAppInfo= new PackageManageHelper(getActivity()).getStartableApps(true);
+                        alAdapter.notifyDataSetChanged();
+                        break;
+                }
+            }
+        };
     }
 
     @Override
@@ -120,7 +142,20 @@ public class FragRight extends Fragment {
     @Override
     public void onResume() {
         setAppsToList();
+        piRec=new packInfoReceiver();
+        IntentFilter filter=new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addDataScheme("package");
+        getActivity().registerReceiver(piRec,filter);
+        Log.i("frag right","onresume adn registered");
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.i("frag right","onpause and do nothing");
     }
 
     @Override
@@ -133,4 +168,12 @@ public class FragRight extends Fragment {
         super.onDetach();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i("frag right","ondestory adn unregistered");
+        if (piRec!=null){
+            getActivity().unregisterReceiver(piRec);
+        }
+    }
 }

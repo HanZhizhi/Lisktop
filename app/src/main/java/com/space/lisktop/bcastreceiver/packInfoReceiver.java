@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.space.lisktop.activities.FragRight;
+
 public class packInfoReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -15,13 +17,14 @@ public class packInfoReceiver extends BroadcastReceiver {
         {
             packName=intent.getData().getSchemeSpecificPart();
             Log.i("recverinstall","1:"+packName+"2"+action);
-            Toast.makeText(context,"anzhuang"+packName,Toast.LENGTH_LONG).show();
+            FragRight.appHandler.sendEmptyMessage(0);
         }
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action))
         {
             packName=intent.getData().getSchemeSpecificPart();
             Log.i("recverremove","1:"+packName+"2"+action);
             Toast.makeText(context,"anzhuang"+packName,Toast.LENGTH_LONG).show();
+            FragRight.appHandler.sendEmptyMessage(0);
         }
         if ("hahaTest".equals(action))
         {

@@ -47,24 +47,24 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity> <!-- 定义广播接收器 -->
+        </activity>
+        <!-- 定义广播接收器 -->
+
         <receiver
             android:name=".bcastreceiver.packInfoReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
 
-                <!-- 应用安装了 -->
                 <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <!-- 应用卸载了 -->
+                <action android:name="android.intent.action.PACKAGE_INSTALL"/>
                 <action android:name="android.intent.action.PACKAGE_REMOVED" />
-                <!-- 应用被覆盖了 -->
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <action android:name="hahaTest" />
-
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".bcastreceiver.AppClickBroadcastReceiver">
             <intent-filter>
                 <action android:name="APP_CLICK_ACTION" />
