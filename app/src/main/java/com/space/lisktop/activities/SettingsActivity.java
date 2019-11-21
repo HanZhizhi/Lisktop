@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +19,7 @@ import com.space.lisktop.R;
 
 
 public class SettingsActivity extends AppCompatActivity {
-    private Button btChooseMain;
+    private Button btChooseMain,btSorter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,14 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(SettingsActivity.this, ChooseDockActivity.class));
+            }
+        });
+
+        btSorter=findViewById(R.id.btn_settings_osrtmechnism);
+        btSorter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(SettingsActivity.this,"目前采用LRU机制对应用进行排序，后续引入应用上升等级、打开次数限制等",Toast.LENGTH_LONG).show();
             }
         });
     }

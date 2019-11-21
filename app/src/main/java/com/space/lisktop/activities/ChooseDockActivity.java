@@ -108,8 +108,9 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
             case R.id.bt_choose_ok:
                 if (numSelected>0)
                 {
-                    lisktopDAO.deleteTable();
-                    boolean sus=lisktopDAO.writeMainApps(selApps);
+                    //TODO：将app表的dock列全改为0，再写入对应的dockApp
+                    lisktopDAO.cancelDockApp();
+                    boolean sus=lisktopDAO.writeDockApps(selApps);
                     Log.i("write","sucsess:"+sus);
                     startActivity(new Intent(this, MainActivity.class));
                     finish();

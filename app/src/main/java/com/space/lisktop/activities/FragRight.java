@@ -30,6 +30,7 @@ import com.space.lisktop.adapters.AppsLvAdapter;
 import com.space.lisktop.bcastreceiver.AppClickBroadcastReceiver;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
+import com.space.lisktop.utility.LisktopDAO;
 import com.space.lisktop.utility.PackageManageHelper;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class FragRight extends Fragment {
     private ListView lvApps;
     private AppsLvAdapter alAdapter;
     private ArrayList<AppInfo> arrAppInfo;
+    private LisktopDAO lisktopDAO;
 
     private packInfoReceiver piRec;       //监听应用安装卸载
     public static Handler appHandler;
@@ -50,6 +52,9 @@ public class FragRight extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        lisktopDAO=new LisktopDAO(getActivity());
+
         appHandler=new Handler(){
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -58,7 +63,11 @@ public class FragRight extends Fragment {
                     case 0:
                         Log.i("right handler","receive msg 0");
                         //TODO:改为数据库时通过intent获取包信息，只更改获取arrAppInfo的方法
-                        arrAppInfo= new PackageManageHelper(getActivity()).getStartableApps(true);
+                        arrAppInfo= lisktopDAO.getAllApps();
+                        for (int i=0;i<arrAppInfo.size();i++)
+                        {
+                            Log.i("handler",i+","+arrAppInfo.get(i).getAppName());
+                        }
                         alAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -75,7 +84,7 @@ public class FragRight extends Fragment {
         packageManager=this.getActivity().getPackageManager();
         //TODO :获取（排序的）应用显示列表，当前直接packagemanager读取，改为读数据库
         //获取应用列表
-        arrAppInfo= new PackageManageHelper(getActivity()).getStartableApps(true);
+        arrAppInfo= lisktopDAO.getAllApps();
         //适配至ListView
         setAppsToList();
 
@@ -133,7 +142,10 @@ public class FragRight extends Fragment {
             //Log.i("length","before add"+arrAppInfo.size()+arrAppInfo.get(0).getAppName());
             arrAppInfo.add(0,aIfo);
             //Log.i("length","after add"+arrAppInfo.size()+arrAppInfo.get(0).getAppName());
-            alAdapter.notifyDataSetChanged();
+            //alAdapter.notifyDataSetChanged();
+
+            lisktopDAO.reOrderApps(arrAppInfo);
+            appHandler.sendEmptyMessage(0);
             //TODO:以上为LRU实现，改为读写数据库实现分类控制
         }
 
@@ -146,6 +158,8 @@ public class FragRight extends Fragment {
         IntentFilter filter=new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);
         filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        filter.addAction(Intent.ACTION_PACKAGE_INSTALL);
         filter.addDataScheme("package");
         getActivity().registerReceiver(piRec,filter);
         Log.i("frag right","onresume adn registered");

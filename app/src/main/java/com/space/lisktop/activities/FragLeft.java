@@ -161,7 +161,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
 
 
         lisktopDAO =new LisktopDAO(context);
-        mainApps=lisktopDAO.getMainApps();
+        mainApps=lisktopDAO.getDockApps();
         //删除原有图标添加新的
         Log.i("childs",layoutMainApps.getChildCount()+"");
         int numChilds=layoutMainApps.getChildCount();

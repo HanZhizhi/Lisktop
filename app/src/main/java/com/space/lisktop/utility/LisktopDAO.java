@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.hardware.biometrics.BiometricManager;
 import android.util.Log;
 
+import com.space.lisktop.activities.FragRight;
 import com.space.lisktop.obj.AppInfo;
 
 import java.io.ByteArrayOutputStream;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 public class LisktopDAO {
     private DBHelper dbHelper;
     private SQLiteDatabase database;
+    private String table_apps=DBHelper.TABLE_USERAPPS,table_usage=DBHelper.CREATE_USAGE,table_note=DBHelper.TABLE_NOTES;
+
     private Context context;
     private final String[] ORDER_COLUMNS = new String[] {"id", "package_name","app_name","app_icon"};
 
@@ -31,7 +34,8 @@ public class LisktopDAO {
         database=dbHelper.getWritableDatabase();
     }
 
-    public boolean isDataExist()
+    //传入表名查询其中记录个数并返回是否存在数据
+    public boolean isDataExist(String tableName)
     {
         int count=0;
         Cursor cursor=null;
@@ -39,7 +43,7 @@ public class LisktopDAO {
         synchronized (dbHelper)
         {
             try{
-                cursor=database.query(DBHelper.TABLE_MAINAPPS,new String[]{"COUNT(id)"},null,null,null,null,null);
+                cursor=database.query(tableName,new String[]{"COUNT(id)"},null,null,null,null,null);
                 if (cursor.moveToFirst())
                 {
                     count=cursor.getCount();
@@ -65,19 +69,18 @@ public class LisktopDAO {
         return false;
     }
 
-    public ArrayList<AppInfo> getMainApps()
-    {
-        ArrayList<AppInfo> mainApps=new ArrayList<>(4);
+    //获取右页列表应用按right_index排序
+    public ArrayList<AppInfo> getAllApps(){
+        ArrayList<AppInfo> appList=new ArrayList<>(32);
         synchronized (dbHelper){
             if (!database.isOpen())
             {
                 database=dbHelper.getWritableDatabase();
             }
-            Cursor cursor=database.query(DBHelper.TABLE_MAINAPPS,ORDER_COLUMNS,null,null,null,null,null);
+            Cursor cursor=database.query(table_apps,null,null,null,null,null,"app_right_index");
             try {
-                while (cursor.moveToNext())
-                {
-                    mainApps.add(parseAppInfo(cursor));
+                while (cursor.moveToNext()){
+                    appList.add(parseAppInfo(cursor));
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -86,7 +89,62 @@ public class LisktopDAO {
                 database.close();
             }
         }
-        return mainApps;
+        return appList;
+    }
+
+    //查询dockApp按顺序返回
+    public ArrayList<AppInfo> getDockApps()
+    {
+        ArrayList<AppInfo> dockApps=new ArrayList<>(5);
+        synchronized (dbHelper){
+            if (!database.isOpen())
+            {
+                database=dbHelper.getWritableDatabase();
+            }
+            //Cursor cursor=database.query(DBHelper.TABLE_MAINAPPS,ORDER_COLUMNS,null,null,null,null,null);
+            //String queryDockApp="select * from "+ table_apps +" where is_dock_app != 0 order by is_dock_app";
+            Cursor cursor=database.query(table_apps,null,"is_dock_app!=?",new String[]{"0"},null,null,"is_dock_app asc","5");
+            try {
+                while (cursor.moveToNext())
+                {
+                    dockApps.add(parseAppInfo(cursor));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                cursor.close();
+                database.close();
+            }
+        }
+        return dockApps;
+    }
+
+    //按顺序将ResolveInfo获取的全部应用写入数据库
+    public void writeInstalledAppsWithOrder(ArrayList<AppInfo> userApps){
+        synchronized (dbHelper) {
+            if (!database.isOpen()) {
+                database = dbHelper.getWritableDatabase();
+            }
+            for(int i=0;i<userApps.size();i++){
+                ContentValues value=new ContentValues();
+                AppInfo appInfo=userApps.get(i);
+                value.put("package_name",appInfo.getPackageName());
+                value.put("app_name",appInfo.getAppName());
+
+                //drawable转为bitmap使用字节输出流
+//                    BitmapDrawable bmDraw=(BitmapDrawable)selectedApps.get(i).getAppIcon();
+                Bitmap bmp= getBitmapFromDrawable(appInfo.getAppIcon());         // bmDraw.getBitmap();
+                ByteArrayOutputStream outStream=new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG,100,outStream);
+                value.put("app_icon",outStream.toByteArray());
+
+                value.put("app_alias",appInfo.getAppAlias());
+                value.put("is_dock_app",0);
+                value.put("app_right_index",(i+1));
+
+                database.insert(table_apps,null,value);
+            }
+        }
     }
 
     private AppInfo parseAppInfo(Cursor cursor)
@@ -99,10 +157,15 @@ public class LisktopDAO {
         Bitmap bm=BitmapFactory.decodeByteArray(blob,0,blob.length);
         BitmapDrawable bmDrwable=new BitmapDrawable(bm);
         ai.setAppIcon(bmDrwable);
+
+        ai.setAppAlias(cursor.getString(cursor.getColumnIndex("app_alias")));
+        ai.setIs_dock_app(cursor.getInt(cursor.getColumnIndex("is_dock_app")));
+        ai.setRight_index(cursor.getInt(cursor.getColumnIndex("app_right_index")));
         return ai;
     }
 
-    public void deleteTable()
+    //取消全部is_dock_app值，改为0
+    public void cancelDockApp()
     {
         synchronized (dbHelper){
             if (!database.isOpen())
@@ -111,7 +174,8 @@ public class LisktopDAO {
             }
             database.beginTransaction();
             try {
-                database.execSQL("delete from "+DBHelper.TABLE_MAINAPPS);
+                //database.execSQL("delete from "+DBHelper.TABLE_MAINAPPS);
+                database.execSQL("update " + table_apps +" set is_dock_app = 0");
                 database.setTransactionSuccessful();
             }
             catch (Exception e)
@@ -123,23 +187,9 @@ public class LisktopDAO {
                 database.close();
             }
         }
-//        try{
-//            db=dbHelper.getWritableDatabase();
-//            db.beginTransaction();
-//            int delNums=db.delete(DBHelper.TABLE_MAINAPPS,null,null);
-//            Log.i("deleted","delete "+delNums);
-//        }
-//        catch (Exception e)
-//        {
-//
-//        }
-//        finally {
-//            if (db!=null)
-//                db.close();
-//        }
     }
 
-    public boolean writeMainApps(ArrayList<AppInfo> selectedApps)
+    public boolean writeDockApps(ArrayList<AppInfo> selectedApps)
     {
         synchronized (dbHelper){
             if (!database.isOpen())
@@ -151,18 +201,9 @@ public class LisktopDAO {
             try {
                 for(int i=0;i<selectedApps.size();i++)
                 {
-                    Log.i("towrite","idx:"+i+"packName:"+selectedApps.get(i).getPackageName());
-                    ContentValues value=new ContentValues();
-                    value.put("id",i);
-                    value.put("package_name",selectedApps.get(i).getPackageName());
-                    value.put("app_name",selectedApps.get(i).getAppName());
-                    //drawable转为bitmap使用字节输出流
-//                    BitmapDrawable bmDraw=(BitmapDrawable)selectedApps.get(i).getAppIcon();
-                    Bitmap bmp= getBitmapFromDrawable(selectedApps.get(i).getAppIcon());         // bmDraw.getBitmap();
-                    ByteArrayOutputStream outStream=new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.PNG,100,outStream);
-                    value.put("app_icon",outStream.toByteArray());
-                    database.insert(DBHelper.TABLE_MAINAPPS,null,value);
+                    String dockapp_packageName=selectedApps.get(i).getPackageName();
+                    database.execSQL("update " + table_apps+" set is_dock_app = 1 where package_name = \"" +dockapp_packageName+"\"");
+                    Log.i("write finish","dockApp:"+(i+1)+"packName:"+dockapp_packageName);
                 }
                 database.setTransactionSuccessful();
             }catch (Exception e){
@@ -176,12 +217,111 @@ public class LisktopDAO {
         return true;
     }
 
+    //发生点击后重新写入应用的app_right_index
+    public void reOrderApps(ArrayList<AppInfo> apps)
+    {
+        //update "userApp" set app_right_index =21 where app_name="Alipay"
+        synchronized (dbHelper) {
+            if (!database.isOpen()) {
+                database = dbHelper.getWritableDatabase();
+            }
+            database.beginTransaction();
+            try {
+                for (int i=0;i<apps.size();i++)
+                {
+                    String packageName=apps.get(i).getPackageName();
+                    int app_index= i+1; //apps.get(i).getRight_index();
+                    String sqlUpdate="update "+table_apps+" set app_right_index ="+app_index +" where package_name= \""+packageName+"\"";
+                    database.execSQL(sqlUpdate);
+                    /*ContentValues cv=new ContentValues();
+                    cv.put("app_right_index",(i+1));
+                    database.update(table_apps,cv,"package_name=?",new String[]{packageName});*/
+                    Log.i("reOrder","wrote "+apps.get(i).getAppName()+",index:"+(i+1));
+                }
+                database.setTransactionSuccessful();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                database.endTransaction();
+                database.close();
+            }
+        }
+    }
+
     static private Bitmap getBitmapFromDrawable(Drawable drawable) {
         final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bmp);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
         return bmp;
+    }
+
+    //安装应用后添加
+    public void insertInstalledApp(String packName,String appName,Drawable appIcon)
+    {
+        synchronized (dbHelper) {
+            if (!database.isOpen()) {
+                database = dbHelper.getWritableDatabase();
+            }
+            //判断ADDED的package是否已存在
+            String sqlPcgExist="select count(package_name) from "+table_apps+" where package_name=\""+packName+"\"";
+            Cursor cursorExist=database.rawQuery(sqlPcgExist,null);
+            cursorExist.moveToFirst();
+            int existPck=cursorExist.getInt(cursorExist.getColumnIndex("count(package_name)"));
+            if (existPck>0){
+                Log.i("rawQery","包已存在");
+                return;
+            }
+            //查询当前应用个数/或最大right_index以确定插入的app_right_index
+            String sqlCur="select max(app_right_index) from "+table_apps;
+            Cursor cursorMaxIndex=database.rawQuery(sqlCur,null);
+            cursorMaxIndex.moveToFirst();
+            int curRight=cursorMaxIndex.getInt(cursorMaxIndex.getColumnIndex("max(app_right_index)"));
+            //插入新的package
+            ContentValues cv=new ContentValues();
+            cv.put("package_name",packName);
+            cv.put("app_name",appName);
+
+            //drawable转为bitmap使用字节输出流
+//                    BitmapDrawable bmDraw=(BitmapDrawable)selectedApps.get(i).getAppIcon();
+            Bitmap bmp= getBitmapFromDrawable(appIcon);         // bmDraw.getBitmap();
+            ByteArrayOutputStream outStream=new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG,100,outStream);
+            cv.put("app_icon",outStream.toByteArray());
+
+            cv.put("app_alias",appName);
+            cv.put("is_dock_app",0);
+            cv.put("app_right_index",(curRight+1));
+            database.insert(table_apps,null,cv);
+            Log.i("rawQuery","cur"+curRight+"已插入");
+        }
+    }
+
+    private int getAppNums()
+    {
+        synchronized (dbHelper){
+            if (!database.isOpen()){
+                database=dbHelper.getWritableDatabase();
+            }
+            String sqlCount="select count(*) from \""+table_apps+"\"";
+            Cursor cursor=database.rawQuery(sqlCount,null);
+            cursor.moveToFirst();
+            return cursor.getInt(cursor.getColumnIndex("count(*)"));
+        }
+    }
+
+    //卸载后从数据库删除，更新列表
+    public void deleteUninstalledApp(String package_name)
+    {
+        synchronized (dbHelper){
+            if (!database.isOpen()) {
+                database = dbHelper.getWritableDatabase();
+            }
+
+            Log.i("删除前",getAppNums()+"个应用");
+            database.delete(table_apps,"package_name=?",new String[]{package_name});
+            Log.i("删除后",getAppNums()+"个应用");
+        }
     }
 
     // 无同步，报错：android.database.sqlite.SQLiteDatabaseLockedException: database is locked (code 5 SQLITE_BUSY)
@@ -199,7 +339,7 @@ public class LisktopDAO {
                 value.put("package_name",selectedApps.get(i).getPackageName());
                 value.put("app_name",selectedApps.get(i).getAppName());
                 value.put("app_index",i);
-                db.insert(DBHelper.TABLE_MAINAPPS,null,value);
+                db.insert(table_apps,null,value);
             }
             db.setTransactionSuccessful();
             return true;

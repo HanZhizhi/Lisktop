@@ -18,6 +18,11 @@
             android:id="@+id/bt_settings_chooseMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="选择" />
+            android:text="选择Dock栏应用" />
+        <Button
+            android:id="@+id/btn_settings_osrtmechnism"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="排序机制"/>
     </LinearLayout>
 </LinearLayout>

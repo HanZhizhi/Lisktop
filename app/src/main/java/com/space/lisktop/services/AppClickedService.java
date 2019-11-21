@@ -30,6 +30,11 @@ public class AppClickedService extends IntentService {
         String package_name=b.getString("appPackName");
 
         //TODO: 排序、数据库操作
+        try {
+            Thread.sleep(600);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         MainActivity.mainHandler.sendEmptyMessage(1);
         Log.i("appclickreceiver",package_name);
