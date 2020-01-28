@@ -245,7 +245,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         switch (v.getId())
         {
             case R.id.tvSettings:
-                startActivity(new Intent(context,SettingsActivity.class));
+                startActivity(new Intent(context, SettingsActivity.class));
                 break;
             default:
                 int idx=(int)v.getTag();

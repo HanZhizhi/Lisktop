@@ -9,7 +9,10 @@
 
     <!-- 设置相关-->
     <string name="show_icon">显示应用图标</string>
-    <string name="icon_summ_on">已显示图标</string>
-    <string name="icon_summ_off">已关闭图标显示</string>
-    <string name="set_motto">设置桌面格言</string>
+    <string name="choose_dock_Apps">选择底栏应用</string>
+    <string name="app_sort_method">选择应用排序机制</string>
+    <string name="set_motto">设置桌面提示</string>
+    <string name="label_app_level">应用分级方法</string>
+    <string name="set_app_levels">设置应用等级</string>
+    <string name="act_sett_label">设置</string>
 </resources>

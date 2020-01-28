@@ -70,6 +70,13 @@ public class FragRight extends Fragment {
                         }
                         alAdapter.notifyDataSetChanged();
                         break;
+                    case 2:
+                        Log.i("frag_right","change icon show");
+                        Bundle siData=msg.getData();
+                        boolean show_me=siData.getBoolean("show_icon??",false);
+                        alAdapter.setShowIcon(show_me);
+                        alAdapter.notifyDataSetChanged();
+                        break;
                 }
             }
         };
@@ -153,7 +160,7 @@ public class FragRight extends Fragment {
 
     @Override
     public void onResume() {
-        setAppsToList();
+        //setAppsToList();
         piRec=new packInfoReceiver();
         IntentFilter filter=new IntentFilter();
         filter.addAction(Intent.ACTION_PACKAGE_ADDED);

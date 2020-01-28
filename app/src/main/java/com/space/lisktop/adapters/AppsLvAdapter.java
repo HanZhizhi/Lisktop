@@ -26,6 +26,10 @@ public class AppsLvAdapter extends BaseAdapter {
         this.showIcon=shIcon;
     }
 
+    public void setShowIcon(boolean showIcon) {
+        this.showIcon = showIcon;
+    }
+
     @Override
     public int getCount() {
         return infoList.size();

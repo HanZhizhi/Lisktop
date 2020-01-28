@@ -10,9 +10,12 @@
 
     <!-- 设置相关-->
     <string name="show_icon">Show icon on launcher</string>
-    <string name="icon_summ_on">Showing icons on launcher</string>
-    <string name="icon_summ_off">Not showing icons on launcher</string>
+    <string name="choose_dock_Apps">Choose Dock Apps</string>
+    <string name="app_sort_method">Choose Method to Sort Apps</string>
     <string name="set_motto">Set a motto on launcher</string>
+    <string name="label_app_level">Methods to  classify Apps</string>
+    <string name="set_app_levels">Set App Levels</string>
+    <string name="act_sett_label">Settings</string>
 
 
 </resources>

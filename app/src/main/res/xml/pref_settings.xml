@@ -24,8 +24,8 @@
             app:key="showicon"
             app:title="@string/show_icon"
             app:useSimpleSummaryProvider="true"
-            android:summaryOn="@string/icon_summ_on"
-            android:summaryOff="@string/icon_summ_off"/>
+            android:summaryOn="SHOWING ON"
+            android:summaryOff="SHOWING OFF"/>
 
         <EditTextPreference
             android:key="motto"

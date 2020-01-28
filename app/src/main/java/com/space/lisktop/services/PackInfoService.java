@@ -31,6 +31,7 @@ public class PackInfoService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
+        //修改安卓8.1以上系统报错
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder builder = new Notification.Builder(this.getApplicationContext())
                     //.setContentIntent(PendingIntent.getActivity(this, 0, new PendingIntent(), 0)) // 设置PendingIntent
@@ -39,22 +40,19 @@ public class PackInfoService extends IntentService {
                     .setContentText("处理应用安装/卸载事件") // 设置上下文内容
                     .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                //修改安卓8.1以上系统报错
-                String CHANNEL_ID="0";
-                NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "zero",NotificationManager.IMPORTANCE_MIN);
-                notificationChannel.enableLights(false);//如果使用中的设备支持通知灯，则说明此通知通道是否应显示灯
-                notificationChannel.setShowBadge(false);//是否显示角标
-                notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
-                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                manager.createNotificationChannel(notificationChannel);
-                builder.setChannelId(CHANNEL_ID);
-            }
+            String CHANNEL_ID="0";
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, "zero",NotificationManager.IMPORTANCE_MIN);
+            notificationChannel.enableLights(false);//如果使用中的设备支持通知灯，则说明此通知通道是否应显示灯
+            notificationChannel.setShowBadge(false);//是否显示角标
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
+            NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(notificationChannel);
+            builder.setChannelId(CHANNEL_ID);
 
             Notification notification = builder.build(); // 获取构建好的Notification
             notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
 
-            startForeground(1, notification); //这个id不要和应用内的其他同志id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
+            startForeground(1, notification); //这个id不要和应用内的其他通知id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
         }
     }
 

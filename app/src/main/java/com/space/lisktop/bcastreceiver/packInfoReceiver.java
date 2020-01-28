@@ -28,11 +28,16 @@ public class packInfoReceiver extends BroadcastReceiver {
             acBundle.putString("appPackName",packName);       //传入包名称进行后续操作
             acBundle.putInt("action",0);
             packAddedIntent.putExtras(acBundle);
-            context.startService(packAddedIntent);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(packAddedIntent);
+            }else {
+                context.startService(packAddedIntent);
+            }
 
             Log.i("recverinstall","1:"+packName+"2"+action);
 
-            FragRight.appHandler.sendEmptyMessage(0);
+            //改在service中操作：FragRight.appHandler.sendEmptyMessage(0);
         }
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action))
         {
