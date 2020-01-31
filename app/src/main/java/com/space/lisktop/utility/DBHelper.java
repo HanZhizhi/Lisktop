@@ -22,8 +22,8 @@ public class DBHelper extends SQLiteOpenHelper {
 //            "app_icon blob)";
 
     public static final String CREATE_USERAPPS="create table if not exists " + TABLE_USERAPPS +
-            //"app_id integer primary key autoincrement unique, " +
-            "(package_name text primary key unique, " +
+            "(app_id integer primary key autoincrement unique, " +
+            "package_name text, " +
             "app_name text, " +
             "app_icon blob, " +
             "app_alias text, " +

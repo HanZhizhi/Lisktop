@@ -65,7 +65,7 @@ public class packInfoReceiver extends BroadcastReceiver {
                 context.startService(packRemovedIntent);
             }
 
-            FragRight.appHandler.sendEmptyMessage(0);
+            FragRight.lHandler.sendEmptyMessage(0);
         }
         if ("hahaTest".equals(action))
         {

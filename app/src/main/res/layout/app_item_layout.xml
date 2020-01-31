@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="4dp"
-    android:orientation="horizontal">
+    android:background="@drawable/bg_app_list"
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/image_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        tools:srcCompat="@android:color/holo_blue_dark" />
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        tools:srcCompat="@android:color/holo_blue_dark"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="2dp"/>
 
     <TextView
         android:id="@+id/list_app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:alpha="0.7"
-        android:gravity="center|left"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:layout_marginLeft="6dp"
-        android:text="哈哈哈"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/image_icon"
+        android:layout_marginLeft="12dp"
+        android:text="AppName"
         android:textColor="#000000"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:maxLines="1"
         android:ellipsize="end"/>
 
 
 
-</LinearLayout>
+</RelativeLayout>

@@ -19,52 +19,38 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
 
 public class SettingsActivity extends AppCompatActivity {
-    private CompoundButton.OnCheckedChangeListener swCheckListener;
     private View.OnClickListener tvClicker;
     private Switch swShowIcon;
-    private SharedPreferences sPref;
     private TextView btChooseDock,btSortMech,btMotto,btAppLevel;
+    int selected_method=LisktopApp.getSortMethod();     // 用于记录选择的排序方式
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        sPref= PreferenceManager.getDefaultSharedPreferences(this);
-
         initViews();
     }
 
     private void initViews()
     {
-
         swShowIcon=findViewById(R.id.set_switch_show_icon);
 
-        boolean if_show_icons=sPref.getBoolean("showicon",false);     //仅用于初始化
+        boolean if_show_icons= LisktopApp.getWhetherShowIcon();      //仅用于初始化
         swShowIcon.setChecked(if_show_icons);
 
-        swCheckListener=new CompoundButton.OnCheckedChangeListener() {
+        swShowIcon.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                switch (buttonView.getId()){
-                    case R.id.set_switch_show_icon:
-                        swShowIcon.setChecked(isChecked);
-                        Message msg=new Message();
-                        Bundle data=new Bundle();
-                        data.putBoolean("show_icon??",isChecked);
-                        msg.setData(data);
-                        msg.what=2;
-                        FragRight.appHandler.sendMessage(msg);
-                        sPref.edit().putBoolean("showicon",isChecked).commit();
-                        break;
-                }
+                swShowIcon.setChecked(isChecked);
+                LisktopApp.setWhetherShowIcon(isChecked);
+                FragRight.lHandler.sendEmptyMessage(2);   // 先更改设置再改变界面
             }
-        };
-
-        swShowIcon.setOnCheckedChangeListener(swCheckListener);
+        });
 
         btChooseDock=findViewById(R.id.set_chs_dock);
         btSortMech=findViewById(R.id.set_sort_mech);
@@ -82,38 +68,36 @@ public class SettingsActivity extends AppCompatActivity {
                         final String[] methods = {"LRU方式", "冒泡法", "次数限制"};
                         AlertDialog.Builder altBuilder=new AlertDialog.Builder(SettingsActivity.this);
                         altBuilder.setTitle("选择应用排序方式");
-                        int choosed_method=0;
-                        altBuilder.setSingleChoiceItems(methods, choosed_method, new DialogInterface.OnClickListener() {
+                        int default_method=LisktopApp.getSortMethod();
+                        altBuilder.setSingleChoiceItems(methods, default_method, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(SettingsActivity.this, methods[which], Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(SettingsActivity.this, methods[which], Toast.LENGTH_SHORT).show();
+                                selected_method=which;
                             }
                         });
                         altBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                LisktopApp.setSortMethod(selected_method);
                             }
                         });
-                        altBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
+                        altBuilder.setNegativeButton("取消", null);
                         AlertDialog dialog=altBuilder.create();
                         dialog.show();
                         break;
                     case R.id.set_motto:
                         AlertDialog.Builder builder_motto=new AlertDialog.Builder(SettingsActivity.this);
                         final EditText etMotto=new EditText(SettingsActivity.this);
-                        etMotto.setText("从sharedprefernce获取");
+                        String motto=LisktopApp.getMotto();
+                        etMotto.setText(motto);
                         builder_motto.setTitle("设置桌面提示")
                                 .setView(etMotto)
                                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Toast.makeText(SettingsActivity.this, etMotto.getText().toString(), Toast.LENGTH_SHORT).show();
+                                        String strMt=etMotto.getText().toString();
+                                        LisktopApp.setMotto(strMt);
                                     }
                                 }).setNegativeButton("取消",null);
                         AlertDialog dlMotto=builder_motto.create();

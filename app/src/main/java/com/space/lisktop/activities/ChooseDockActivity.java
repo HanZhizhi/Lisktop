@@ -52,7 +52,7 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
         btOK.setOnClickListener(this);
 
         apps=new PackageManageHelper(this).getStartableApps(true);
-        adapter=new AppsLvAdapter(apps,this,true);
+        adapter=new AppsLvAdapter(apps,this);
         lvApps.setAdapter(adapter);
         lvApps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

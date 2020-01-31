@@ -11,6 +11,8 @@ public class AppInfo {
     private int is_dock_app;
     private int right_index;    //在右页应用列表中的顺序
 
+    private boolean is_show_icon;  //是否显示图标，不写入数据库中，为便于使用notifyDatasetChanged修改直接添加到类中
+
 
     public AppInfo()
     {}
@@ -20,6 +22,7 @@ public class AppInfo {
         this.appName=aName;
         this.packageName=pName;
         this.appIcon=aIcon;
+        this.is_show_icon=true;
     }
 
     public void setAppAlias(String appAlias) {
@@ -69,4 +72,10 @@ public class AppInfo {
     public void setAppIcon(Drawable appIcon) {
         this.appIcon = appIcon;
     }
+
+    public void setIs_show_icon(boolean is_show_icon) {
+        this.is_show_icon = is_show_icon;
+    }
+
+    public boolean getIs_show_icon(){return is_show_icon;}
 }

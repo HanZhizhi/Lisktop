@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import android.os.SystemClock;
+import android.provider.AlarmClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,8 +25,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextClock;
 import android.widget.TextView;
 
+import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
 import com.space.lisktop.bcastreceiver.TimeReceiver;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
@@ -39,11 +42,11 @@ import java.util.List;
 public class FragLeft extends Fragment implements View.OnClickListener {
     private Context context;
     private TextView tvSettings,tvMotto;
+    private TextClock tcTime;
     private LisktopDAO lisktopDAO;
     private LinearLayout layoutMainApps;
     private ArrayList<AppInfo> mainApps;
     private PackageManager packMan;
-    SharedPreferences sPref;
     private IntentFilter intentFilter;
     private TimeReceiver timeChangeReceiver;
     private AlarmManager alarmManager;
@@ -143,8 +146,10 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         layoutMainApps.setOrientation(LinearLayout.HORIZONTAL);
 
         tvMotto=rootV.findViewById(R.id.left_motto);
-        sPref= PreferenceManager.getDefaultSharedPreferences(context);
-        tvMotto.setText(sPref.getString("motto","哈哈哈!"));
+        tvMotto.setText(LisktopApp.getMotto());
+
+        tcTime=rootV.findViewById(R.id.clock_time);
+        tcTime.setOnClickListener(this);
     }
 
     @Override
@@ -157,7 +162,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     @Override
     //TODO:onResume需要大改
     public void onResume() {
-        tvMotto.setText(sPref.getString("motto","HaHaHa!"));
+        tvMotto.setText(LisktopApp.getMotto());
 
 
         lisktopDAO =new LisktopDAO(context);
@@ -246,6 +251,11 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         {
             case R.id.tvSettings:
                 startActivity(new Intent(context, SettingsActivity.class));
+                break;
+            case R.id.clock_time:
+                Intent itClock=new Intent(AlarmClock.ACTION_SET_ALARM);
+                itClock.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(itClock);
                 break;
             default:
                 int idx=(int)v.getTag();

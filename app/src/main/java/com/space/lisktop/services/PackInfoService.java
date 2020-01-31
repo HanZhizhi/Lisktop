@@ -77,7 +77,7 @@ public class PackInfoService extends IntentService {
                     Log.i("packService","anzhuang:"+app_name);
 
                     lisktopDAO.insertInstalledApp(package_name,app_name,app_icon);
-                    FragRight.appHandler.sendEmptyMessage(0);
+                    FragRight.lHandler.sendEmptyMessage(0);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -85,7 +85,7 @@ public class PackInfoService extends IntentService {
             case 1:
                 //删除数据库记录
                 lisktopDAO.deleteUninstalledApp(package_name);
-                FragRight.appHandler.sendEmptyMessage(0);
+                FragRight.lHandler.sendEmptyMessage(0);
                 break;
         }
     }

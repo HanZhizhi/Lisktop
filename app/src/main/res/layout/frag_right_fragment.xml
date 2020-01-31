@@ -4,12 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#ffffff"
     tools:context=".activities.FragRight">
 
     <ListView
         android:id="@+id/installed_apps"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:divider="#eeeeee"
+        android:dividerHeight="0.5dp"
         android:overScrollMode="never"/>
 
 </LinearLayout>

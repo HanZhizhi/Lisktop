@@ -55,7 +55,7 @@ public class MainActivity extends FragmentActivity {
 
         Log.i("mainact","oncreate");
 
-        if (isFirstOpen()){
+        if (LisktopApp.getFirstOpen()){
             Intent welIntent=new Intent(this, WelActivity.class);
             startActivity(welIntent);
             Log.i("first_open","go to wel");
@@ -86,12 +86,6 @@ public class MainActivity extends FragmentActivity {
         pManager=getPackageManager();
     }
 
-    private boolean isFirstOpen(){
-        //MainActivity中判断，选择完dock后判断并改为false
-        SharedPreferences sPref=getSharedPreferences("first_open",MODE_PRIVATE);
-        return sPref.getBoolean("first_open",true);
-    }
-
     private void initViews()
     {
         pager=findViewById(R.id.main_viewpager);
@@ -118,22 +112,6 @@ public class MainActivity extends FragmentActivity {
         });*/
         pager.setCurrentItem(0);
         pager.setOffscreenPageLimit(fragList.size());
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.i("page_change","now page:"+position+"--"+positionOffset+"--"+positionOffsetPixels);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 
     @Override
