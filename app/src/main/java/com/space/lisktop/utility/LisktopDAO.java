@@ -202,7 +202,8 @@ public class LisktopDAO {
                 for(int i=0;i<selectedApps.size();i++)
                 {
                     String dockapp_packageName=selectedApps.get(i).getPackageName();
-                    database.execSQL("update " + table_apps+" set is_dock_app = 1 where package_name = \"" +dockapp_packageName+"\"");
+                    String dockapp_appName=selectedApps.get(i).getAppName();
+                    database.execSQL("update " + table_apps+" set is_dock_app = 1 where package_name = \"" +dockapp_packageName+"\" and app_name =\"" + dockapp_appName +"\"");
                     Log.i("write finish","dockApp:"+(i+1)+"packName:"+dockapp_packageName);
                 }
                 database.setTransactionSuccessful();
@@ -229,9 +230,9 @@ public class LisktopDAO {
             try {
                 for (int i=0;i<apps.size();i++)
                 {
-                    String packageName=apps.get(i).getPackageName();
+                    String packageName=apps.get(i).getPackageName(),appName=apps.get(i).getAppName();
                     int app_index= i+1; //apps.get(i).getRight_index();
-                    String sqlUpdate="update "+table_apps+" set app_right_index ="+app_index +" where package_name= \""+packageName+"\"";
+                    String sqlUpdate="update "+table_apps+" set app_right_index ="+app_index +" where package_name= \""+packageName+"\" and app_name =\"" + appName +"\"";
                     database.execSQL(sqlUpdate);
                     /*ContentValues cv=new ContentValues();
                     cv.put("app_right_index",(i+1));
@@ -248,6 +249,19 @@ public class LisktopDAO {
         }
     }
 
+    public int getRightIndex(String pName_ri,String aName_ri){
+        synchronized (dbHelper){
+            if (!database.isOpen()){
+                database=dbHelper.getWritableDatabase();
+            }
+            String sqlRightIndex="select app_right_index from "+table_apps+" where package_name=\""+pName_ri+"\" and app_name=\""+aName_ri+"\"";
+            Cursor cursorRightIndex=database.rawQuery(sqlRightIndex,null);
+            cursorRightIndex.moveToFirst();
+            int rightIndex=cursorRightIndex.getInt(cursorRightIndex.getColumnIndex("app_right_index"));
+            return rightIndex;
+        }
+    }
+
     static private Bitmap getBitmapFromDrawable(Drawable drawable) {
         final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bmp);
@@ -257,14 +271,14 @@ public class LisktopDAO {
     }
 
     //安装应用后添加
-    public void insertInstalledApp(String packName,String appName,Drawable appIcon)
+    public void insertInstalledApp(String packName_insert,String appName_insert,Drawable appIcon)
     {
         synchronized (dbHelper) {
             if (!database.isOpen()) {
                 database = dbHelper.getWritableDatabase();
             }
             //判断ADDED的package是否已存在
-            String sqlPcgExist="select count(package_name) from "+table_apps+" where package_name=\""+packName+"\"";
+            String sqlPcgExist="select count(package_name) from "+table_apps+" where package_name=\""+packName_insert+"\" and app_name= \""+appName_insert+"\"";
             Cursor cursorExist=database.rawQuery(sqlPcgExist,null);
             cursorExist.moveToFirst();
             int existPck=cursorExist.getInt(cursorExist.getColumnIndex("count(package_name)"));
@@ -279,8 +293,8 @@ public class LisktopDAO {
             int curRight=cursorMaxIndex.getInt(cursorMaxIndex.getColumnIndex("max(app_right_index)"));
             //插入新的package
             ContentValues cv=new ContentValues();
-            cv.put("package_name",packName);
-            cv.put("app_name",appName);
+            cv.put("package_name",packName_insert);
+            cv.put("app_name",appName_insert);
 
             //drawable转为bitmap使用字节输出流
 //                    BitmapDrawable bmDraw=(BitmapDrawable)selectedApps.get(i).getAppIcon();
@@ -289,7 +303,7 @@ public class LisktopDAO {
             bmp.compress(Bitmap.CompressFormat.PNG,100,outStream);
             cv.put("app_icon",outStream.toByteArray());
 
-            cv.put("app_alias",appName);
+            cv.put("app_alias",appName_insert);
             cv.put("is_dock_app",0);
             cv.put("app_right_index",(curRight+1));
             database.insert(table_apps,null,cv);

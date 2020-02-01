@@ -15,9 +15,7 @@ import com.space.lisktop.services.PackInfoService;
 public class packInfoReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("received",intent.toString());
         String action=intent.getAction();
-        //TODO:在此处启动IntentService更改数据库，然后handler
         if (Intent.ACTION_PACKAGE_ADDED.equals(action))
         {
             String packName=intent.getData().getSchemeSpecificPart();
@@ -34,16 +32,10 @@ public class packInfoReceiver extends BroadcastReceiver {
             }else {
                 context.startService(packAddedIntent);
             }
-
-            Log.i("recverinstall","1:"+packName+"2"+action);
-
-            //改在service中操作：FragRight.appHandler.sendEmptyMessage(0);
         }
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action))
         {
             String packName=intent.getData().getSchemeSpecificPart();
-            Log.i("recverremove","1:"+packName+"2"+action);
-            Toast.makeText(context,"anzhuang"+packName,Toast.LENGTH_LONG).show();
 
             Intent packRemovedIntent=new Intent(context, PackInfoService.class);
             Bundle acBundle=new Bundle();

@@ -23,16 +23,21 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="b430cae2-cb51-4eca-b4c4-e811e1102412">
+        <schema name="main" object-types="table, column, view" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="b430cae2-cb51-4eca-b4c4-e811e1102412">
-      <console name="Connection" type="STANDARD" schema="main" session="Main"><![CDATA[select * from userApp;
+      <console name="Connection" type="STANDARD" schema="main" session="Main">select * from userApp;
 select max(app_right_index) from userApp;
-select count(package_name) from "userApp" where package_name="com.eg.android.AlayGphone";
-insert into "userApp" values ("packName","haha",null,"gfg",0, 60,0,0,0)
-delete from "userApp" where package_name="packName"
-select count(*) from "userApp"]]></console>
+select count(package_name) from &quot;userApp&quot; where package_name=&quot;com.eg.android.AlayGphone&quot;;
+insert into &quot;userApp&quot; values (&quot;packName&quot;,&quot;haha&quot;,null,&quot;gfg&quot;,0, 60,0,0,0)
+delete from &quot;userApp&quot; where package_name=&quot;packName&quot;
+select count(*) from &quot;userApp&quot;
+select * from &quot;userApp&quot; where is_dock_app=1</console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">

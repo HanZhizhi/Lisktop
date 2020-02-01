@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,7 @@ public class FragRight extends Fragment {
     public static ListHandler lHandler;
 
     private boolean if_show_icons;     //全局变量，创建adapter时初始化，appHandler收到更改时改变
+    private int longclickedItem=-1;    //长按的应用号，在长按中赋值，contextMenu中使用
 
     public static class ListHandler extends Handler{
         WeakReference<FragRight> refer;
@@ -116,24 +118,27 @@ public class FragRight extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // 打开应用
                 String packName=arrAppInfo.get(position).getPackageName();
+                String appName=arrAppInfo.get(position).getAppName();
                 Intent intent=packageManager.getLaunchIntentForPackage(packName);
                 startActivity(intent);
 
                 // 后续Service操作：重排序、数据库、界面响应
                 Intent appClickServiceIntent=new Intent(getActivity(), AppClickedService.class);
                 Bundle acBundle=new Bundle();
-                acBundle.putInt("click_pos",position);
-                acBundle.putString("appPackName",packName);       //传入包名称进行后续操作
+                //acBundle.putInt("click_pos",position);
+                acBundle.putString("packName",packName);       //传入包名称进行后续操作
+                acBundle.putString("appName",appName);
                 appClickServiceIntent.putExtras(acBundle);
                 getActivity().startService(appClickServiceIntent);
             }
         });
-        /** lvApps.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        lvApps.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                longclickedItem=position;
                 return false;
             }
-        });**/
+        });
         lvApps.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -152,13 +157,17 @@ public class FragRight extends Fragment {
                 Toast.makeText(getActivity(),"隐藏",Toast.LENGTH_SHORT).show();
                 break;
             case 1:
-                Toast.makeText(getActivity(),"卸载",Toast.LENGTH_SHORT).show();
+                String pack_to_uninstall=arrAppInfo.get(longclickedItem).getPackageName();
+                Uri uri = Uri.parse("package:" + pack_to_uninstall);
+                Intent intent = new Intent(Intent.ACTION_DELETE, uri);
+                getActivity().startActivity(intent);
                 break;
             default:
                 break;
         }
         return super.onContextItemSelected(item);
     }
+
 
     @Override
     public void onResume() {    // 在onResume和destory中注册、解绑Receiver

@@ -8,6 +8,9 @@
     <string name="left_word">HaHaHa</string>
     <string name="settings_choose_mainApp">Choose Apps shown on main page</string>
 
+    <!-- 左页Motto弹框标题 -->
+    <string name="fleft_mottor">Set Words</string>
+
     <!-- 设置相关-->
     <string name="show_icon">Show icon on launcher</string>
     <string name="choose_dock_Apps">Choose Dock Apps</string>
@@ -16,6 +19,8 @@
     <string name="label_app_level">Methods to  classify Apps</string>
     <string name="set_app_levels">Set App Levels</string>
     <string name="act_sett_label">Settings</string>
+    <string name="dialog_positive">Confirm</string>
+    <string name="dialog_negative">Cancel</string>
 
 
 </resources>

@@ -2,8 +2,10 @@ package com.space.lisktop.activities;
 
 import android.app.ActivityManager;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -23,6 +25,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
@@ -33,6 +36,7 @@ import com.space.lisktop.R;
 import com.space.lisktop.bcastreceiver.TimeReceiver;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
+import com.space.lisktop.services.AppClickedService;
 import com.space.lisktop.utility.LisktopDAO;
 
 import java.util.ArrayList;
@@ -147,6 +151,26 @@ public class FragLeft extends Fragment implements View.OnClickListener {
 
         tvMotto=rootV.findViewById(R.id.left_motto);
         tvMotto.setText(LisktopApp.getMotto());
+        tvMotto.setLongClickable(true);
+        tvMotto.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                final EditText etv=new EditText(getActivity());
+                etv.setText(LisktopApp.getMotto());
+                AlertDialog.Builder adb=new AlertDialog.Builder(getActivity());
+                adb.setTitle(R.string.fleft_mottor).setView(etv)
+                        .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                LisktopApp.setMotto(etv.getText().toString());
+                                tvMotto.setText(LisktopApp.getMotto());
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_negative,null);
+                adb.create().show();
+                return true;
+            }
+        });
 
         tcTime=rootV.findViewById(R.id.clock_time);
         tcTime.setOnClickListener(this);
@@ -163,7 +187,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     //TODO:onResume需要大改
     public void onResume() {
         tvMotto.setText(LisktopApp.getMotto());
-
 
         lisktopDAO =new LisktopDAO(context);
         mainApps=lisktopDAO.getDockApps();
@@ -257,10 +280,19 @@ public class FragLeft extends Fragment implements View.OnClickListener {
                 itClock.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(itClock);
                 break;
-            default:
+            default:     // 点击dock应用：启动，service。
                 int idx=(int)v.getTag();
-                Intent go=packMan.getLaunchIntentForPackage(mainApps.get(idx).getPackageName());
+                AppInfo appInfo=mainApps.get(idx);
+                String pack=appInfo.getPackageName(),app=appInfo.getAppName();
+                Intent go=packMan.getLaunchIntentForPackage(pack);
                 startActivity(go);
+
+                Intent appClickServiceIntent=new Intent(getActivity(), AppClickedService.class);
+                Bundle acBundle=new Bundle();
+                acBundle.putString("packName",pack);       //传入包名称进行后续操作
+                acBundle.putString("appName",app);
+                appClickServiceIntent.putExtras(acBundle);
+                getActivity().startService(appClickServiceIntent);
                 break;
         }
     }

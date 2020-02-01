@@ -1,5 +1,8 @@
 package com.space.lisktop.utility;
 
+import android.os.Bundle;
+import android.util.Log;
+
 import com.space.lisktop.obj.AppInfo;
 import java.util.ArrayList;
 
@@ -12,7 +15,7 @@ import java.util.ArrayList;
 
 public class AppClickedSorter {
     // 对外方法，传入排序方法、应用列表及点击位置
-    public static void Sort(int sortingMethod,ArrayList<AppInfo> list1,int whichApp){
+    public static void Sort(int sortingMethod, ArrayList<AppInfo> list1,int whichApp){
         switch (sortingMethod){
             case 0:
                 LruSorter(list1,whichApp);
@@ -29,8 +32,10 @@ public class AppClickedSorter {
     // 最近最新使用，将点击的应用从原位置删除并添加到开头
     private static void LruSorter(ArrayList<AppInfo> list, int which){
         AppInfo aIfo=list.get(which);
+        Log.i("lru before:",list.get(0).getAppName());
         list.remove(list.get(which));
         list.add(0,aIfo);
+        Log.i("lru after:",list.get(0).getAppName());
     }
 
     private static void PopSorter(ArrayList<AppInfo> list, int which){

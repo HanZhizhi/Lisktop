@@ -3,6 +3,7 @@ package com.space.lisktop.obj;
 import android.graphics.drawable.Drawable;
 
 public class AppInfo {
+    private int appId;
     private String appName; //应用名
     private String appAlias;   //别名
     private String packageName;    //包名称

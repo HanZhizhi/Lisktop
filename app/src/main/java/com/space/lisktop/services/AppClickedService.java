@@ -33,19 +33,17 @@ public class AppClickedService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Bundle b=intent.getExtras();
-        String package_name=b.getString("appPackName");
-        int pos=b.getInt("click_pos");
+        Bundle bd=intent.getExtras();
+        String package_name=bd.getString("packName"),application_name=bd.getString("appName");
 
         lisktopDAO=new LisktopDAO(getApplicationContext());
         ArrayList<AppInfo> appList1=lisktopDAO.getAllApps();
 
-        String packageName_veriyf=appList1.get(pos).getPackageName();
-        if (packageName_veriyf.equals(package_name))                          //验证
-        {
-            AppClickedSorter.Sort(LisktopApp.getSortMethod(),appList1,pos);   //排序
-            lisktopDAO.reOrderApps(appList1);                                 //写库
-        }
+        int clicked_index=lisktopDAO.getRightIndex(package_name,application_name)-1;  //用于排序的下标为ArrayList下标，而数据库中从1开始
+
+        Log.i("service",":"+package_name+clicked_index+application_name);
+        AppClickedSorter.Sort(LisktopApp.getSortMethod(),appList1,clicked_index);   //排序
+        lisktopDAO.reOrderApps(appList1);                                 //写库
 
         // 防止应用打开前先转到左页
         try {
