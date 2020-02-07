@@ -64,15 +64,15 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         packMan=context.getPackageManager();
         Log.i("fd","oncreate");
 
-        /**使用系统timetick进行监听
-         * intentFilter = new IntentFilter();
+        //使用系统timetick进行监听
+        /*intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_TIME_TICK);//每分钟变化
         intentFilter.addAction(Intent.ACTION_DATE_CHANGED);//日期变化
         intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);//设置了系统时区
         intentFilter.addAction(Intent.ACTION_TIME_CHANGED);//设置了系统时间
 
         timeChangeReceiver = new TimeReceiver();
-         context.registerReceiver(timeChangeReceiver, intentFilter);*/
+        context.registerReceiver(timeChangeReceiver, intentFilter);*/
 
         /**
          * 使用AlarmManager进行设定
@@ -80,7 +80,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         alarmManager=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent=new Intent(context, packInfoReceiver.class);      //创建Intent时写入目标receiver
         intent.setAction("hahaTest");
-        /** 启动service
+        /* 启动service
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             pendingIntent = PendingIntent.getForegroundService(context, 0,
                     intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -93,7 +93,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         pendingIntent=PendingIntent.getBroadcast(context,0,intent,0);
 
         //通过calendar设置执行时间
-        Calendar c=Calendar.getInstance();
+        Calendar c1=Calendar.getInstance(),c2=Calendar.getInstance();
 
         /*c.set(Calendar.YEAR,2019);
         c.set(Calendar.MONTH,Calendar.JUNE);//也可以填数字，0-11,一月为0
@@ -102,13 +102,16 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         c.set(Calendar.MINUTE, 50);
         c.set(Calendar.SECOND, 0);
         //设定时间为 2011年6月28日19点50分0秒*/
-        c.set(2019, 11,12, 10,11, 0);
+        c1.set(2020, 1,3, 12,59, 10);
+        c2.set(2020, 1,3, 12,51, 10);
+
+        Log.i("alarmaneger compare",""+(c2.getTimeInMillis()-c1.getTimeInMillis()));
         //也可以写在一行里
         //am.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//6.0低电量模式需要使用该方法触发定时任务
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+1000, pendingIntent);
-            Log.i("alarmaneger set","create > m");
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, c1.getTimeInMillis(), pendingIntent);    // SystemClock.elapsedRealtime()+2000
+            Log.i("alarmaneger set","create > m ："+System.currentTimeMillis()+":"+c1.getTimeInMillis());
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {//4.4以上 需要使用该方法精确执行时间
             Log.i("alarmaneger set","create > 4.4");
             alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+1000, pendingIntent);

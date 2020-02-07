@@ -41,7 +41,7 @@ public class LisktopApp extends Application {
     }
 
     public static String getMotto(){
-        return sPref.getString("motto","LiskTop!!");
+        return sPref.getString("motto","长按修改提示");
     }
 
     // 应用点击后排序方式

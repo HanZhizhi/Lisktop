@@ -61,7 +61,7 @@ public class packInfoReceiver extends BroadcastReceiver {
         }
         if ("hahaTest".equals(action))
         {
-            Log.i("hahaTest","from packInfoRecver");
+            Log.i("alarm","from packInfoRecver:"+System.currentTimeMillis());
         }
     }
 }
