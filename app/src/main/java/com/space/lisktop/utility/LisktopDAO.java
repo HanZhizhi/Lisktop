@@ -372,4 +372,63 @@ public class LisktopDAO {
         }
         return false;
     }
+
+
+    // 待办事项相关
+    public ArrayList<String> getMainTodos(){
+        ArrayList<String> todos=new ArrayList<>(32);
+        synchronized (dbHelper){
+            if (!database.isOpen())
+            {
+                database=dbHelper.getWritableDatabase();
+            }
+            Cursor cursor=database.rawQuery("select * from \""+table_note +"\" where finished =0 order by id",null);
+            try {
+                while (cursor.moveToNext()){
+                    todos.add(cursor.getString(cursor.getColumnIndex("note_todo")));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                cursor.close();
+                database.close();
+            }
+        }
+        return todos;
+    }
+
+    public void insertTodo(String todo){
+        synchronized (dbHelper){
+            if (!database.isOpen()){
+                database=dbHelper.getWritableDatabase();
+            }
+            ContentValues cv=new ContentValues();
+            cv.put("note_todo",todo);
+            cv.put("finished",0);
+            database.insert(table_note,null,cv);
+        }
+    }
+
+    public void finishTodo(String todo){
+        synchronized (dbHelper){
+            if(!database.isOpen()){
+                database=dbHelper.getWritableDatabase();
+            }
+            database.beginTransaction();
+            try {
+                //database.execSQL("delete from "+DBHelper.TABLE_MAINAPPS);
+                database.execSQL("update " + table_note +" set finished = 1 where note_todo = \""+todo+"\"");
+                database.setTransactionSuccessful();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            finally {
+                database.endTransaction();
+                database.close();
+            }
+        }
+    }
+
 }

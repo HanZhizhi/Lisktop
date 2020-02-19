@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,6 +19,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.SystemClock;
 import android.provider.AlarmClock;
@@ -30,17 +36,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextClock;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.space.lisktop.Dock;
 import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
+import com.space.lisktop.adapters.TodoAdapter;
 import com.space.lisktop.bcastreceiver.TimeReceiver;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
+import com.space.lisktop.obj.RecyclerDecorator;
 import com.space.lisktop.services.AppClickedService;
 import com.space.lisktop.utility.LisktopDAO;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 public class FragLeft extends Fragment implements View.OnClickListener {
@@ -48,7 +61,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     private TextView tvSettings,tvMotto;
     private TextClock tcTime;
     private LisktopDAO lisktopDAO;
-    private LinearLayout layoutMainApps;
     private ArrayList<AppInfo> mainApps;
     private PackageManager packMan;
     private IntentFilter intentFilter;
@@ -56,12 +68,21 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private int dock_icon_size=60;     //dock栏图标的大小,单位dp，默认60
+    private Dock dock1;
+
+    private RecyclerView recTodos;
+    private TodoAdapter tdAdapter;
+    private RecyclerView.LayoutManager tdLayouter;
+    private ItemTouchHelper itemTouchHelper;
+
+    private TextView tvAddTodo;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context=getActivity();
         packMan=context.getPackageManager();
+        lisktopDAO =new LisktopDAO(context);
         Log.i("fd","oncreate");
 
         //使用系统timetick进行监听
@@ -149,8 +170,8 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         tvSettings=rootV.findViewById(R.id.tvSettings);
         tvSettings.setOnClickListener(this);
 
-        layoutMainApps=rootV.findViewById(R.id.llayout_mainApps);
-        layoutMainApps.setOrientation(LinearLayout.HORIZONTAL);
+
+        dock1=rootV.findViewById(R.id.left_dock);
 
         tvMotto=rootV.findViewById(R.id.left_motto);
         tvMotto.setText(LisktopApp.getMotto());
@@ -177,6 +198,111 @@ public class FragLeft extends Fragment implements View.OnClickListener {
 
         tcTime=rootV.findViewById(R.id.clock_time);
         tcTime.setOnClickListener(this);
+
+        recTodos=rootV.findViewById(R.id.todos);
+        String s1[]={"yi","22","33","44"};
+        final ArrayList<String> data= lisktopDAO.getMainTodos();
+        //Collections.addAll(data,s1);
+        tdAdapter=new TodoAdapter(data);
+        tdAdapter.setOnItemClickListener(new TodoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Toast.makeText(getActivity(),"点击："+data.get(position),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                Toast.makeText(getActivity(),"长按："+data.get(position),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onChecked(View view, int position) {
+                String deled=tdAdapter.delete(position);
+                lisktopDAO.finishTodo(deled);
+            }
+        });
+        recTodos.setAdapter(tdAdapter);
+        recTodos.addItemDecoration(new RecyclerDecorator(getActivity(),LinearLayoutManager.VERTICAL));
+        ItemTouchHelper.Callback callBack=new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                //return makeMovementFlags(0,ItemTouchHelper.START | ItemTouchHelper.END);  //滑动删除
+                return makeMovementFlags(ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT | ItemTouchHelper.DOWN | ItemTouchHelper.UP, 1);
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                tdAdapter.move(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                tdAdapter.delete(viewHolder.getAdapterPosition());
+            }
+
+            /**
+             * Item被选中时候，改变Item的背景
+             */
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                //  item被选中的操作
+                if(actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                    viewHolder.itemView.setBackgroundColor(Color.parseColor("#aaaaaa"));
+                }
+                super.onSelectedChanged(viewHolder, actionState);
+            }
+
+            /**
+             * 移动过程中重新绘制Item，随着滑动的距离，设置Item的透明度
+             */
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                float x = Math.abs(dX) + 0.5f;
+                float width = viewHolder.itemView.getWidth();
+                float alpha = 1f - x / width;
+                viewHolder.itemView.setAlpha(alpha);
+                //viewHolder.itemView.setScaleX(1.2f);
+                //viewHolder.itemView.setScaleY(1.2f);
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
+                        isCurrentlyActive);
+            }
+
+            /**
+             * 用户操作完毕或者动画完毕后调用，恢复item的背景和透明度
+             */
+            @Override
+            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                // 操作完毕后恢复颜色
+                viewHolder.itemView.setBackgroundColor(Color.WHITE);
+                viewHolder.itemView.setAlpha(1.0f);
+                //viewHolder.itemView.setScaleX(1.0f);
+                //viewHolder.itemView.setScaleY(1.0f);
+                super.clearView(recyclerView, viewHolder);
+            }
+
+        };
+        itemTouchHelper=new ItemTouchHelper(callBack);
+        itemTouchHelper.attachToRecyclerView(recTodos);
+        tdLayouter=new LinearLayoutManager(getActivity());
+        recTodos.setLayoutManager(tdLayouter);
+        recTodos.setItemAnimator(new DefaultItemAnimator());
+
+
+        tvAddTodo=rootV.findViewById(R.id.todo_add);
+        tvAddTodo.setOnClickListener(this);
     }
 
     @Override
@@ -191,27 +317,16 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     public void onResume() {
         tvMotto.setText(LisktopApp.getMotto());
 
-        lisktopDAO =new LisktopDAO(context);
+
         mainApps=lisktopDAO.getDockApps();
-        //删除原有图标添加新的
-        Log.i("childs",layoutMainApps.getChildCount()+"");
-        int numChilds=layoutMainApps.getChildCount();
-        for (int i=0;i<numChilds;i++)      //原本将getChildCount写在循环中，导致循环上届改变，子view未删完
-        {
-            Log.i("todeleteview",i+"--"+layoutMainApps.getChildAt(0).getId());
-            layoutMainApps.removeView(layoutMainApps.getChildAt(0));           //原为getChildAt(i)，改为一直删除第0个
-        }
-        if(mainApps.size() > 0){
-            addMainApp(mainApps);
-        }
+
+        Log.i("dockleft","num"+mainApps.size());
+        if(mainApps.size() >0)
+            dock1.addDockApps(mainApps);
 
         super.onResume();
     }
 
-    /**
-     * 传入选定的主页应用list，默认图标大小为60dp,根据屏幕宽度计算间距（左右已pad20dp）
-     * @param infoList
-     */
     private void addMainApp(ArrayList<AppInfo> infoList)
     {
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -239,36 +354,8 @@ public class FragLeft extends Fragment implements View.OnClickListener {
 
             iv.setTag(i);
             iv.setOnClickListener(this);
-            layoutMainApps.addView(iv,params1);
+            //layoutMainApps.addView(iv,params1);
         }
-    }
-
-    /**
-     *
-     * @param aInfo:添加的appInfo
-     * @param tag 设置给图标的tag，传入为appInfo在数组中的索引
-     */
-    private void addMainApp1(AppInfo aInfo,int tag)
-    {
-        ImageView iv=new ImageView(context);
-        iv.setImageDrawable(aInfo.getAppIcon());
-        // 也可以自己想要的宽度，参数（int width, int height）均表示px
-        // 如dp单位，首先获取屏幕的分辨率在求出密度，根据屏幕ppi=160时，1px=1dp
-        //则公式为 dp * ppi / 160 = px ——> dp * dendity = px
-        //如设置为48dp：1、获取屏幕的分辨率 2、求出density 3、设置
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float density = displayMetrics.density;
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(
-                (int)(60 * density),
-                (int)(60 * density));
-        //相当于android:layout_marginLeft="8dp"
-        params1.leftMargin = 8;
-        params1.rightMargin=8;
-
-        iv.setTag(tag);
-        iv.setOnClickListener(this);
-        layoutMainApps.addView(iv,params1);
     }
 
     @Override
@@ -277,11 +364,30 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         {
             case R.id.tvSettings:
                 startActivity(new Intent(context, SettingsActivity.class));
+                tdAdapter.addNewItem("新加入数据");
                 break;
             case R.id.clock_time:
                 Intent itClock=new Intent(AlarmClock.ACTION_SET_ALARM);
                 itClock.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(itClock);
+                break;
+            case R.id.todo_add:
+                //AlertDialog
+                final EditText etv=new EditText(getActivity());
+                etv.setText(LisktopApp.getMotto());
+                AlertDialog.Builder adbuilder=new AlertDialog.Builder(getActivity());
+                adbuilder.setTitle(R.string.fleft_mottor).setView(etv)
+                        .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String newTodo=etv.getText().toString();
+                                tdAdapter.addNewItem(newTodo);
+                                lisktopDAO.insertTodo(newTodo);
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_negative,null);
+                adbuilder.create().show();
+                tdLayouter.scrollToPosition(0);
                 break;
             default:     // 点击dock应用：启动，service。
                 int idx=(int)v.getTag();

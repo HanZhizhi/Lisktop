@@ -42,8 +42,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static final String CREATE_NOTE="create table if not exists " + TABLE_NOTES +
             "(id integer primary key autoincrement unique," +
-            "note text" +
-            ")";
+            "note_todo text," +
+            "finished int8 default 0)";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null,DB_VERSION);

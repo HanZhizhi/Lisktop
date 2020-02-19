@@ -7,6 +7,14 @@
     android:orientation="vertical"
     tools:context=".activities.ChooseDockActivity">
 
+    <com.space.lisktop.Dock
+        android:id="@+id/chser_dock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:iconPaddingTop="8dp"
+        app:dockIconSize="60dp"
+        app:dockBacgroundColor="#eeeeee"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="80dp">

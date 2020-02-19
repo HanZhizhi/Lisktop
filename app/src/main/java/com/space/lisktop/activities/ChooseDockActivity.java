@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.space.lisktop.Dock;
 import com.space.lisktop.MainActivity;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
@@ -28,6 +29,7 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
     private ListView lvApps;
     private Button btOK;
     private LinearLayout llSeled;   //显示已选应用
+    private Dock dockChoosing;
     private ArrayList<AppInfo> apps=new ArrayList<>(),selApps=new ArrayList<>();
     private AppsLvAdapter adapter;
     private int numSelected=0;
@@ -48,6 +50,8 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
         lvApps=findViewById(R.id.lv_choose);
         llSeled=findViewById(R.id.llayout_choosed);
         llSeled.setOrientation(LinearLayout.HORIZONTAL);
+
+        dockChoosing=(Dock)findViewById(R.id.chser_dock);
 
         btOK.setOnClickListener(this);
 
@@ -97,6 +101,7 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
         llSeled.addView(iv,params1);
 
         selApps.add(apps.get(arg));
+        dockChoosing.addDockApps(selApps);
         apps.remove(apps.get(arg));
         adapter.notifyDataSetChanged();
     }
@@ -122,6 +127,7 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
             default:
                 int idx=(int)v.getTag();
                 llSeled.removeView(llSeled.getChildAt(idx));
+                dockChoosing.removeAppAt(idx);
 
                 //添加到下面并排序，更新列表
                 apps.add(selApps.get(idx));

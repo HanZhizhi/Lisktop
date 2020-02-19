@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#ffffff"
     tools:context=".activities.FragLeft">
@@ -55,6 +56,8 @@
 
     </RelativeLayout>
 
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -76,27 +79,54 @@
             android:maxLines="5"
             android:scrollHorizontally="false"/>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#fafbfc">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="待办事项"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="6dp"
+                android:textSize="18sp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"/>
+
+            <TextView
+                android:id="@+id/todo_add"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="4dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="+"
+                android:textSize="28sp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/todos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                android:layout_below="@+id/todo_add"
+                android:layout_margin="2dp"
+                />
+
+        </RelativeLayout>
+
+
     </RelativeLayout>
 
-    <!-- 内外layout的宽高设为wraap_content，根据图标大小调整间距 -->
-    <RelativeLayout
+    <com.space.lisktop.Dock
+        android:id="@+id/left_dock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#f8f8f8">
-
-        <LinearLayout
-            android:id="@+id/llayout_mainApps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:layout_centerHorizontal="true"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-        </LinearLayout>
-
-    </RelativeLayout>
+        app:iconPaddingTop="8dp"
+        app:dockIconSize="60dp"
+        app:dockBacgroundColor="#eeeeee"/>
 
 </LinearLayout>

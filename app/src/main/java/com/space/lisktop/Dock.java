@@ -1,62 +1,113 @@
 package com.space.lisktop;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.space.lisktop.obj.AppInfo;
+import com.space.lisktop.services.AppClickedService;
 
 import java.util.ArrayList;
 
-public class Dock extends LinearLayout {
-    private int dockHeight,dockWidth;
+public class Dock extends LinearLayout implements View.OnClickListener,View.OnTouchListener {
+    private int dockHeight=0,dockWidth;
     private int dockBgColor;
-    private float displayDensity;
-    private LinearLayout dockLinearLayout;
+    private int iconSize,iconPadTop;
+    private float density;
+    private Context ctx;
+    private PackageManager packageManager;
+    private ArrayList<AppInfo> dockApps;
 
     public Dock(Context context) {
-        super(context);
-        initView(context);
+        this(context,null);
     }
 
     public Dock(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        initView(context);
-        initAttrs(context,attrs);
+        this(context, attrs,0);
     }
 
     public Dock(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.setOrientation(LinearLayout.HORIZONTAL);
+        ctx=context;
+        packageManager=ctx.getPackageManager();
 
-        initView(context);
         initAttrs(context,attrs);
+        initView(context);
     }
 
     private void initView(Context context){
-        LayoutInflater.from(context).inflate(R.layout.dock_layout,this,true);
-        dockLinearLayout=findViewById(R.id.dock_l_layout);
-        dockLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        //View view= LayoutInflater.from(context).inflate(R.layout.dock_layout,this,true);
+        setOrientation(LinearLayout.HORIZONTAL);
+        setBackgroundColor(dockBgColor);
     }
 
     private void initAttrs(Context context, AttributeSet attrs){
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();  //getSystemService(Context.WINDOW_SERVICE).getDefaultDisplay().getMetrics(displayMetrics);
-        displayDensity=displayMetrics.density;
+        density =displayMetrics.density;
         dockWidth=displayMetrics.widthPixels;
 
         TypedArray ta=context.obtainStyledAttributes(attrs,R.styleable.Dock);
+        iconSize=(int)ta.getDimension(R.styleable.Dock_dockIconSize,dp2px(context,60));         //图标大小，60dp转为像素
+        iconPadTop=(int)ta.getDimension(R.styleable.Dock_iconPaddingTop,dp2px(context,15));     //图标与上下边距，默认15
+        //setPadding(iconPadTop*2,iconPadTop,iconPadTop*2,iconPadTop);
 
-        dockHeight=(int)ta.getDimension(R.styleable.dockHeight,dp2px(context,100));
+        dockHeight=iconSize; //添加图标时设置了padTop，故此处不需要  //(int)ta.getDimension(R.styleable.Dock_dockHeight,dp2px(context,100));
+        dockBgColor=ta.getColor(R.styleable.Dock_dockBacgroundColor, Color.parseColor("#f8f8f8"));
 
+        Log.i("dock","height:"+dockHeight+",width:"+dockWidth);
+        ta.recycle();
     }
 
-    private void addDockApps(ArrayList<AppInfo> apps){
+    public void addDockApps(ArrayList<AppInfo> apps){
+        this.dockApps=apps;
+        this.removeAllViews();
+        int numApps=apps.size();
+        int sideMargin=dp2px(ctx,20);        // Layout的左右缩进，即屏幕最左右边与图标的左右margin距离,20dp
+        int pads=(dockWidth-2*sideMargin-iconSize*numApps)/(2*numApps);    //每个图标左右的margin
+        Log.i("dock","numapp"+numApps+",side:"+sideMargin+",pads"+pads+"app:"+iconSize);
 
+        for(int i=0;i<apps.size();i++)
+        {
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(iconSize,iconSize);
+            params1.leftMargin = pads;
+            params1.rightMargin=pads;
+            params1.topMargin=(iconPadTop);
+            params1.bottomMargin=(iconPadTop);
+
+            if(i==0)
+                params1.leftMargin=sideMargin+pads;
+            if(i==apps.size()-1)
+                params1.rightMargin=sideMargin+pads;
+
+            ImageView iv=new ImageView(ctx);
+            iv.setImageDrawable(apps.get(i).getAppIcon());
+
+            iv.setTag(i);
+            iv.setOnClickListener(this);
+            this.addView(iv,i,params1);
+            Log.i("dock","add"+apps.get(i).getAppName());
+        }
+    }
+
+    public void removeAppAt(int index){
+        this.removeViewAt(index);
     }
 
     private int dp2px(Context context, float dp) {
@@ -65,13 +116,27 @@ public class Dock extends LinearLayout {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(dockWidth,dockHeight);
+    public boolean onTouch(View v, MotionEvent event) {
+        return false;
     }
 
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
+    public void onClick(View v) {
+        switch (v.getId()){
+            default:
+                int clickIndex= (int) v.getTag();
+                AppInfo appInfo=dockApps.get(clickIndex);
+                String pack=appInfo.getPackageName(),app=appInfo.getAppName();
+                Intent go=packageManager.getLaunchIntentForPackage(pack);
+                ctx.startActivity(go);
+
+                Intent appClickServiceIntent=new Intent(ctx, AppClickedService.class);
+                Bundle acBundle=new Bundle();
+                acBundle.putString("packName",pack);       //传入包名称进行后续操作
+                acBundle.putString("appName",app);
+                appClickServiceIntent.putExtras(acBundle);
+                ctx.startService(appClickServiceIntent);
+                break;
+        }
     }
 }

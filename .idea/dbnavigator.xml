@@ -23,7 +23,11 @@
     <autoscroll-to-editor value="false" />
     <autoscroll-from-editor value="true" />
     <show-object-properties value="true" />
-    <loaded-nodes />
+    <loaded-nodes>
+      <connection connection-id="b430cae2-cb51-4eca-b4c4-e811e1102412">
+        <schema name="main" object-types="view, column, table" />
+      </connection>
+    </loaded-nodes>
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="b430cae2-cb51-4eca-b4c4-e811e1102412">
@@ -33,7 +37,9 @@ select count(package_name) from "userApp" where package_name="com.eg.android.Ala
 insert into "userApp" values ("packName","haha",null,"gfg",0, 60,0,0,0)
 delete from "userApp" where package_name="packName"
 select count(*) from "userApp"
-select * from "userApp" where is_dock_app=1]]></console>
+select * from "userApp" where is_dock_app=1
+select * from note where finished = 0 order by id
+update note set finished =1 where note_todo="jiaoshuiweima"]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
