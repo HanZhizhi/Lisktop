@@ -25,7 +25,7 @@ import com.space.lisktop.R;
 public class SettingsActivity extends AppCompatActivity {
     private View.OnClickListener tvClicker;
     private Switch swShowIcon;
-    private TextView btChooseDock,btSortMech,btMotto,btAppLevel;
+    private TextView btChooseDock,btSortMech,btAppLevel;
     int selected_method=LisktopApp.getSortMethod();     // 用于记录选择的排序方式
 
     @Override
@@ -54,7 +54,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         btChooseDock=findViewById(R.id.set_chs_dock);
         btSortMech=findViewById(R.id.set_sort_mech);
-        btMotto=findViewById(R.id.set_motto);
         btAppLevel=findViewById(R.id.set_app_level);
 
         tvClicker=new View.OnClickListener() {
@@ -85,23 +84,6 @@ public class SettingsActivity extends AppCompatActivity {
                         altBuilder.setNegativeButton("取消", null);
                         AlertDialog dialog=altBuilder.create();
                         dialog.show();
-                        break;
-                    case R.id.set_motto:
-                        AlertDialog.Builder builder_motto=new AlertDialog.Builder(SettingsActivity.this);
-                        final EditText etMotto=new EditText(SettingsActivity.this);
-                        String motto=LisktopApp.getMotto();
-                        etMotto.setText(motto);
-                        builder_motto.setTitle("设置桌面提示")
-                                .setView(etMotto)
-                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        String strMt=etMotto.getText().toString();
-                                        LisktopApp.setMotto(strMt);
-                                    }
-                                }).setNegativeButton("取消",null);
-                        AlertDialog dlMotto=builder_motto.create();
-                        dlMotto.show();
                         break;
                     case R.id.set_app_level:
                         final String[] level_methods={"一级","五级","三级"};
@@ -135,7 +117,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         btChooseDock.setOnClickListener(tvClicker);
         btSortMech.setOnClickListener(tvClicker);
-        btMotto.setOnClickListener(tvClicker);
         btAppLevel.setOnClickListener(tvClicker);
     }
 }

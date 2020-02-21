@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,6 +29,7 @@ public class TodoAdapter extends RecyclerView.Adapter {
             super(itemView);
             checkBox=itemView.findViewById(R.id.cb_todo);
             checkBox.setChecked(false);
+            setIsRecyclable(false);
         }
     }
 
@@ -42,6 +42,7 @@ public class TodoAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.todo_item_layout,parent,false);
         TodoHolder tdHolder=new TodoHolder(v);
+        tdHolder.checkBox.setChecked(false);
         return tdHolder;
     }
 

@@ -1,8 +1,14 @@
 package com.space.lisktop.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -14,7 +20,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.space.lisktop.Dock;
+import com.space.lisktop.adapters.ChooserAdapter;
+import com.space.lisktop.views.Dock;
 import com.space.lisktop.MainActivity;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
@@ -28,19 +35,29 @@ import java.util.Comparator;
 public class ChooseDockActivity extends AppCompatActivity  implements View.OnClickListener {
     private ListView lvApps;
     private Button btOK;
-    private LinearLayout llSeled;   //显示已选应用
-    private Dock dockChoosing;
-    private ArrayList<AppInfo> apps=new ArrayList<>(),selApps=new ArrayList<>();
+    private ArrayList<AppInfo> apps,selApps=new ArrayList<>();
     private AppsLvAdapter adapter;
     private int numSelected=0;
     private LisktopDAO lisktopDAO;
+
+    private RecyclerView recSeldApps;
+    private ChooserAdapter chsAdapter;
+    private RecyclerView.LayoutManager layManager;
+    private ItemTouchHelper recTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_main);
+        setTitle(R.string.chser_title);
 
         lisktopDAO=new LisktopDAO(this);
+        apps=new PackageManageHelper(this).getStartableApps(true);
+
+        //selApps=lisktopDAO.getDockApps();
+        //Log.i("remove","len-apps:"+apps.size()+",selapps:"+selApps.size());
+        //apps.removeAll(selApps);
+        //Log.i("remove","len-apps:"+apps.size()+",selapps:"+selApps.size());
         initViews();
     }
 
@@ -48,14 +65,107 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
     {
         btOK=findViewById(R.id.bt_choose_ok);
         lvApps=findViewById(R.id.lv_choose);
-        llSeled=findViewById(R.id.llayout_choosed);
-        llSeled.setOrientation(LinearLayout.HORIZONTAL);
 
-        dockChoosing=(Dock)findViewById(R.id.chser_dock);
+        recSeldApps=findViewById(R.id.chsed_apps_recyclerview);
+        recSeldApps.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        chsAdapter=new ChooserAdapter(selApps);
+        ItemTouchHelper.Callback callback=new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT | ItemTouchHelper.DOWN | ItemTouchHelper.UP, 0);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                Collections.swap(selApps,viewHolder.getAdapterPosition(),target.getAdapterPosition());
+                chsAdapter.notifyItemMoved(viewHolder.getAdapterPosition(),target.getAdapterPosition());
+                return true;
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+
+            /**
+             * Item被选中时候，改变Item的背景
+             */
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                //  item被选中的操作
+                if(actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                    viewHolder.itemView.setBackgroundColor(Color.parseColor("#aaaaaa"));
+                }
+                super.onSelectedChanged(viewHolder, actionState);
+            }
+
+            /**
+             * 移动过程中重新绘制Item，随着滑动的距离，设置Item的透明度
+             */
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView,
+                                    RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                float x = Math.abs(dX) + 0.5f;
+                float width = viewHolder.itemView.getWidth();
+                float alpha = 1f - x / width;
+                viewHolder.itemView.setAlpha(alpha);
+                //viewHolder.itemView.setScaleX(1.2f);
+                //viewHolder.itemView.setScaleY(1.2f);
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
+                        isCurrentlyActive);
+            }
+
+            /**
+             * 用户操作完毕或者动画完毕后调用，恢复item的背景和透明度
+             */
+            @Override
+            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                // 操作完毕后恢复颜色
+                viewHolder.itemView.setBackgroundColor(Color.WHITE);
+                viewHolder.itemView.setAlpha(1.0f);
+                //viewHolder.itemView.setScaleX(1.0f);
+                //viewHolder.itemView.setScaleY(1.0f);
+                super.clearView(recyclerView, viewHolder);
+            }
+        };
+        recTouchHelper=new ItemTouchHelper(callback);
+        recTouchHelper.attachToRecyclerView(recSeldApps);
+        chsAdapter.setOnIconClickListener(new ChooserAdapter.IconClickListener() {
+            @Override
+            public void OnIconClicked(int index) {
+                AppInfo appToDel=selApps.get(index);
+
+                selApps.remove(index);
+                chsAdapter.notifyItemRemoved(index);
+
+                apps.add(appToDel);
+                Collections.sort(apps, new Comparator<AppInfo>() {
+                    @Override
+                    public int compare(AppInfo o1, AppInfo o2) {
+                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getAppName(),o2.getAppName());
+                    }
+                });
+                adapter.notifyDataSetChanged();
+
+                numSelected-=1;
+            }
+        });
+        recSeldApps.setAdapter(chsAdapter);
 
         btOK.setOnClickListener(this);
 
-        apps=new PackageManageHelper(this).getStartableApps(true);
+        // 显示所有可启动应用
         adapter=new AppsLvAdapter(apps,this);
         lvApps.setAdapter(adapter);
         lvApps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,47 +173,19 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (numSelected<5)
                 {
-                    selectApp(position);
+                    AppInfo ckApp=apps.get(position);
+
+                    selApps.add(ckApp);
+                    chsAdapter.notifyItemInserted(position);
+
+                    apps.remove(ckApp);
+                    adapter.notifyDataSetChanged();
                     numSelected+=1;
                 }
                 else
                     Toast.makeText(ChooseDockActivity.this,"最多五个哦~", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void selectApp(int arg)
-    {
-        ImageView iv=new ImageView(this);
-        iv.setImageDrawable(apps.get(arg).getAppIcon());
-
-        // 也可以自己想要的宽度，参数（int width, int height）均表示px
-        // 如dp单位，首先获取屏幕的分辨率在求出密度，根据屏幕ppi=160时，1px=1dp
-        //则公式为 dp * ppi / 160 = px ——> dp * dendity = px
-        //如设置为48dp：1、获取屏幕的分辨率 2、求出density 3、设置
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float density = displayMetrics.density;
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(
-                (int)(60 * density),
-                (int)(60 * density));
-        //相当于android:layout_marginLeft="8dp"
-        params1.leftMargin = 8;
-        params1.rightMargin=8;
-
-//        ViewGroup.LayoutParams param=iv.getLayoutParams();
-//        param.height=60;
-//        param.width=60;
-
-        //llSeled.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0,1));
-        iv.setTag(numSelected);
-        iv.setOnClickListener(this);
-        llSeled.addView(iv,params1);
-
-        selApps.add(apps.get(arg));
-        dockChoosing.addDockApps(selApps);
-        apps.remove(apps.get(arg));
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -113,7 +195,6 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
             case R.id.bt_choose_ok:
                 if (numSelected>0)
                 {
-                    //TODO：将app表的dock列全改为0，再写入对应的dockApp
                     lisktopDAO.cancelDockApp();
                     boolean sus=lisktopDAO.writeDockApps(selApps);
                     Log.i("write","sucsess:"+sus);
@@ -121,27 +202,9 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
                     finish();
                 }
                 else {
-                    Toast.makeText(this,"请选择主页应用",Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this,"请选择主页应用",Toast.LENGTH_SHORT).show();
+                    finish();
                 }
-                break;
-            default:
-                int idx=(int)v.getTag();
-                llSeled.removeView(llSeled.getChildAt(idx));
-                dockChoosing.removeAppAt(idx);
-
-                //添加到下面并排序，更新列表
-                apps.add(selApps.get(idx));
-                Collections.sort(apps, new Comparator<AppInfo>() {
-                    @Override
-                    public int compare(AppInfo o1, AppInfo o2) {
-                        return String.CASE_INSENSITIVE_ORDER.compare(o1.getAppName(),o2.getAppName());
-                    }
-                });
-                adapter.notifyDataSetChanged();
-                // TODO:可以将线性布局中添加图片改为列表
-                selApps.remove(selApps.get(idx));
-                numSelected-=1;
-                Toast.makeText(ChooseDockActivity.this,"选择个数："+selApps.size()+llSeled.getChildCount(), Toast.LENGTH_SHORT).show();
                 break;
         }
     }

@@ -10,6 +10,9 @@
     <!-- 左页Motto弹框标题 -->
     <string name="fleft_mottor">设置语句</string>
 
+    <!-- 待办事项相关 -->
+    <string name="todo_title" >待办事项</string>
+
     <!-- 设置相关-->
     <string name="show_icon">显示应用图标</string>
     <string name="choose_dock_Apps">选择底栏应用</string>
@@ -20,5 +23,7 @@
     <string name="act_sett_label">设置</string>
     <string name="dialog_positive">确认</string>
     <string name="dialog_negative">取消</string>
+
+    <string name="chser_title">选择主页应用</string>
 
 </resources>

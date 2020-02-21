@@ -11,6 +11,9 @@
     <!-- 左页Motto弹框标题 -->
     <string name="fleft_mottor">Set Words</string>
 
+    <!-- 待办事项相关 -->
+    <string name="todo_title" >To-do List</string>
+
     <!-- 设置相关-->
     <string name="show_icon">Show icon on launcher</string>
     <string name="choose_dock_Apps">Choose Dock Apps</string>
@@ -22,5 +25,7 @@
     <string name="dialog_positive">Confirm</string>
     <string name="dialog_negative">Cancel</string>
 
+
+    <string name="chser_title">Choose Dock Apps</string>
 
 </resources>

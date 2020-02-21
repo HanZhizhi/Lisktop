@@ -1,34 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".activities.ChooseDockActivity">
 
-    <com.space.lisktop.Dock
-        android:id="@+id/chser_dock"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chsed_apps_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:iconPaddingTop="8dp"
-        app:dockIconSize="60dp"
-        app:dockBacgroundColor="#eeeeee"/>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="80dp">
-
-        <LinearLayout
-            android:id="@+id/llayout_choosed"
-            android:layout_width="wrap_content"
-            android:layout_height="80dp"
-            android:layout_centerHorizontal="true"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-        </LinearLayout>
-
-    </RelativeLayout>
+        android:layout_height="80dp"
+        android:background="#f3f4f5"/>
 
 
     <ListView

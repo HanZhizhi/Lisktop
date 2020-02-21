@@ -35,14 +35,14 @@ public class LisktopApp extends Application {
         sPref.edit().putBoolean("showicon",b).apply();
     }
 
-    // 设置及获取左页格言
+    /*// 设置及获取左页格言
     public static void setMotto(String motto){
         sPref.edit().putString("motto",motto).apply();
     }
 
     public static String getMotto(){
         return sPref.getString("motto","长按修改提示");
-    }
+    }*/
 
     // 应用点击后排序方式
     public static void setSortMethod(int method){

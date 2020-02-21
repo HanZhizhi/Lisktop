@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -18,7 +17,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,7 +36,7 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.space.lisktop.Dock;
+import com.space.lisktop.views.Dock;
 import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.TodoAdapter;
@@ -49,16 +47,13 @@ import com.space.lisktop.obj.RecyclerDecorator;
 import com.space.lisktop.services.AppClickedService;
 import com.space.lisktop.utility.LisktopDAO;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 public class FragLeft extends Fragment implements View.OnClickListener {
     private Context context;
-    private TextView tvSettings,tvMotto;
+    private TextView tvSettings;
     private TextClock tcTime;
     private LisktopDAO lisktopDAO;
     private ArrayList<AppInfo> mainApps;
@@ -170,49 +165,21 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         tvSettings=rootV.findViewById(R.id.tvSettings);
         tvSettings.setOnClickListener(this);
 
-
         dock1=rootV.findViewById(R.id.left_dock);
-
-        tvMotto=rootV.findViewById(R.id.left_motto);
-        tvMotto.setText(LisktopApp.getMotto());
-        tvMotto.setLongClickable(true);
-        tvMotto.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                final EditText etv=new EditText(getActivity());
-                etv.setText(LisktopApp.getMotto());
-                AlertDialog.Builder adb=new AlertDialog.Builder(getActivity());
-                adb.setTitle(R.string.fleft_mottor).setView(etv)
-                        .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                LisktopApp.setMotto(etv.getText().toString());
-                                tvMotto.setText(LisktopApp.getMotto());
-                            }
-                        })
-                        .setNegativeButton(R.string.dialog_negative,null);
-                adb.create().show();
-                return true;
-            }
-        });
 
         tcTime=rootV.findViewById(R.id.clock_time);
         tcTime.setOnClickListener(this);
 
         recTodos=rootV.findViewById(R.id.todos);
-        String s1[]={"yi","22","33","44"};
         final ArrayList<String> data= lisktopDAO.getMainTodos();
-        //Collections.addAll(data,s1);
         tdAdapter=new TodoAdapter(data);
         tdAdapter.setOnItemClickListener(new TodoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(getActivity(),"点击："+data.get(position),Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                Toast.makeText(getActivity(),"长按："+data.get(position),Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -300,7 +267,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         recTodos.setLayoutManager(tdLayouter);
         recTodos.setItemAnimator(new DefaultItemAnimator());
 
-
         tvAddTodo=rootV.findViewById(R.id.todo_add);
         tvAddTodo.setOnClickListener(this);
     }
@@ -315,9 +281,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     @Override
     //TODO:onResume需要大改
     public void onResume() {
-        tvMotto.setText(LisktopApp.getMotto());
-
-
         mainApps=lisktopDAO.getDockApps();
 
         Log.i("dockleft","num"+mainApps.size());
@@ -374,15 +337,16 @@ public class FragLeft extends Fragment implements View.OnClickListener {
             case R.id.todo_add:
                 //AlertDialog
                 final EditText etv=new EditText(getActivity());
-                etv.setText(LisktopApp.getMotto());
+                etv.setText("add to-do");
                 AlertDialog.Builder adbuilder=new AlertDialog.Builder(getActivity());
                 adbuilder.setTitle(R.string.fleft_mottor).setView(etv)
                         .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String newTodo=etv.getText().toString();
-                                tdAdapter.addNewItem(newTodo);
-                                lisktopDAO.insertTodo(newTodo);
+                                String todoInfo=etv.getText().toString();
+                                tdAdapter.addNewItem(todoInfo);
+                                lisktopDAO.insertTodo(todoInfo);
+                                return;
                             }
                         })
                         .setNegativeButton(R.string.dialog_negative,null);

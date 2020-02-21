@@ -33,16 +33,6 @@
             android:textSize="18sp"/>
 
         <TextView
-            android:id="@+id/set_motto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="14dp"
-            android:text="@string/set_motto"
-            android:textColor="#000000"
-            android:alpha="0.6"
-            android:textSize="18sp"/>
-
-        <TextView
             android:id="@+id/set_sort_mech"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

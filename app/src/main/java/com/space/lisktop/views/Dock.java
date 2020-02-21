@@ -1,4 +1,4 @@
-package com.space.lisktop;
+package com.space.lisktop.views;
 
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.space.lisktop.R;
 import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.services.AppClickedService;
 
@@ -63,7 +64,7 @@ public class Dock extends LinearLayout implements View.OnClickListener,View.OnTo
         density =displayMetrics.density;
         dockWidth=displayMetrics.widthPixels;
 
-        TypedArray ta=context.obtainStyledAttributes(attrs,R.styleable.Dock);
+        TypedArray ta=context.obtainStyledAttributes(attrs, R.styleable.Dock);
         iconSize=(int)ta.getDimension(R.styleable.Dock_dockIconSize,dp2px(context,60));         //图标大小，60dp转为像素
         iconPadTop=(int)ta.getDimension(R.styleable.Dock_iconPaddingTop,dp2px(context,15));     //图标与上下边距，默认15
         //setPadding(iconPadTop*2,iconPadTop,iconPadTop*2,iconPadTop);
