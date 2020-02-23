@@ -4,14 +4,11 @@
 
     <string name="settings_display">显示</string>
     <string name="title_activity_settings">设置</string>
-    <string name="left_word">人生得意须尽欢</string>
     <string name="settings_choose_mainApp">选择主页应用</string>
-
-    <!-- 左页Motto弹框标题 -->
-    <string name="fleft_mottor">设置语句</string>
 
     <!-- 待办事项相关 -->
     <string name="todo_title" >待办事项</string>
+    <string name="todo_prompt">添加待办</string>
 
     <!-- 设置相关-->
     <string name="show_icon">显示应用图标</string>
@@ -25,5 +22,7 @@
     <string name="dialog_negative">取消</string>
 
     <string name="chser_title">选择主页应用</string>
+
+    <string name="man_hidden">管理隐藏应用</string>
 
 </resources>

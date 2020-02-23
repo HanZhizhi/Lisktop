@@ -69,6 +69,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     private TodoAdapter tdAdapter;
     private RecyclerView.LayoutManager tdLayouter;
     private ItemTouchHelper itemTouchHelper;
+    private ArrayList<String> todoList;
 
     private TextView tvAddTodo;
 
@@ -171,8 +172,8 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         tcTime.setOnClickListener(this);
 
         recTodos=rootV.findViewById(R.id.todos);
-        final ArrayList<String> data= lisktopDAO.getMainTodos();
-        tdAdapter=new TodoAdapter(data);
+        todoList= lisktopDAO.getMainTodos();
+        tdAdapter=new TodoAdapter(todoList);
         tdAdapter.setOnItemClickListener(new TodoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -259,7 +260,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
                 //viewHolder.itemView.setScaleY(1.0f);
                 super.clearView(recyclerView, viewHolder);
             }
-
         };
         itemTouchHelper=new ItemTouchHelper(callBack);
         itemTouchHelper.attachToRecyclerView(recTodos);
@@ -327,7 +327,6 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         {
             case R.id.tvSettings:
                 startActivity(new Intent(context, SettingsActivity.class));
-                tdAdapter.addNewItem("新加入数据");
                 break;
             case R.id.clock_time:
                 Intent itClock=new Intent(AlarmClock.ACTION_SET_ALARM);
@@ -337,16 +336,20 @@ public class FragLeft extends Fragment implements View.OnClickListener {
             case R.id.todo_add:
                 //AlertDialog
                 final EditText etv=new EditText(getActivity());
-                etv.setText("add to-do");
+                etv.setText("");
                 AlertDialog.Builder adbuilder=new AlertDialog.Builder(getActivity());
-                adbuilder.setTitle(R.string.fleft_mottor).setView(etv)
+                adbuilder.setTitle(R.string.todo_prompt).setView(etv)
                         .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String todoInfo=etv.getText().toString();
-                                tdAdapter.addNewItem(todoInfo);
-                                lisktopDAO.insertTodo(todoInfo);
-                                return;
+                                if(todoList.contains(todoInfo)){
+                                    Toast.makeText(getActivity(),"待办已存在！",Toast.LENGTH_SHORT).show();
+                                }
+                                else{
+                                    tdAdapter.addNewItem(todoInfo);
+                                    lisktopDAO.insertTodo(todoInfo);
+                                }
                             }
                         })
                         .setNegativeButton(R.string.dialog_negative,null);

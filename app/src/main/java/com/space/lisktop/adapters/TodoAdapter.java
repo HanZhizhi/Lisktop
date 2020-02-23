@@ -29,7 +29,7 @@ public class TodoAdapter extends RecyclerView.Adapter {
             super(itemView);
             checkBox=itemView.findViewById(R.id.cb_todo);
             checkBox.setChecked(false);
-            setIsRecyclable(false);
+            //setIsRecyclable(false);
         }
     }
 

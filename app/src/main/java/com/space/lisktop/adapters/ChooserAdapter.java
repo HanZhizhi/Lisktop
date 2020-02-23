@@ -1,5 +1,6 @@
 package com.space.lisktop.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.space.lisktop.R;
 import com.space.lisktop.obj.AppInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ChooserAdapter extends RecyclerView.Adapter {
     private ArrayList<AppInfo> selectedApps;
@@ -26,8 +28,8 @@ public class ChooserAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public ChooserAdapter(ArrayList<AppInfo> selApps){
-        this.selectedApps=selApps;
+    public ChooserAdapter(){
+        this.selectedApps=new ArrayList<>();
     }
 
     @NonNull
@@ -49,6 +51,7 @@ public class ChooserAdapter extends RecyclerView.Adapter {
             ((SelHolder) holder).appIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Log.i("onBind","pos:"+position);
                     if(iconClickListener!=null){
                         iconClickListener.OnIconClicked(position);
                     }
@@ -66,15 +69,33 @@ public class ChooserAdapter extends RecyclerView.Adapter {
         public void OnIconClicked(int index);
     }
 
-    public void insert111App(int pos,AppInfo app){
-        //selectedApps.add(pos,app);
-        notifyItemInserted(pos);
+    public void addApp(AppInfo app){
+        selectedApps.add(app);
+        //notifyItemInserted();
+        notifyDataSetChanged();
     }
 
-    public void removeApp(int pos){
+    public AppInfo removeApp(int pos){
         if(selectedApps==null || selectedApps.isEmpty())
-            return;
+            return null;
+        AppInfo delApp=selectedApps.get(pos);
         selectedApps.remove(pos);
         notifyItemRemoved(pos);
+        notifyItemRangeChanged(pos,selectedApps.size()-pos);         //删除后更新下标
+        return delApp;
+    }
+
+    public void swapApps(int from, int to){
+        Collections.swap(selectedApps,from,to);
+        //logSeledApps(selApps);
+        notifyItemMoved(from, to);
+    }
+
+    public int getSelectedNum(){
+        return this.selectedApps.size();
+    }
+
+    public ArrayList<AppInfo> getSelectedApps(){
+        return this.selectedApps;
     }
 }

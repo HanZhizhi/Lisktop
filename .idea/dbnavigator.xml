@@ -34,8 +34,10 @@ insert into "userApp" values ("packName","haha",null,"gfg",0, 60,0,0,0)
 delete from "userApp" where package_name="packName"
 select count(*) from "userApp"
 select * from "userApp" where is_dock_app=1
-select * from note where finished = 0 order by id
-update note set finished =1 where note_todo="jiaoshuiweima"]]></console>
+select * from note order by id
+update note set finished =1 where note_todo="jiaoshuiweima"
+
+update "userApp" set app_hidden=1 where package_name="net.csdn.csdnplus"]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">

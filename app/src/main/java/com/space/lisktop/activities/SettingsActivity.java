@@ -25,7 +25,7 @@ import com.space.lisktop.R;
 public class SettingsActivity extends AppCompatActivity {
     private View.OnClickListener tvClicker;
     private Switch swShowIcon;
-    private TextView btChooseDock,btSortMech,btAppLevel;
+    private TextView btChooseDock,btSortMech,btAppLevel,btHidden;
     int selected_method=LisktopApp.getSortMethod();     // 用于记录选择的排序方式
 
     @Override
@@ -55,6 +55,7 @@ public class SettingsActivity extends AppCompatActivity {
         btChooseDock=findViewById(R.id.set_chs_dock);
         btSortMech=findViewById(R.id.set_sort_mech);
         btAppLevel=findViewById(R.id.set_app_level);
+        btHidden=findViewById(R.id.set_man_hidden);
 
         tvClicker=new View.OnClickListener() {
             @Override
@@ -111,12 +112,17 @@ public class SettingsActivity extends AppCompatActivity {
                         AlertDialog dialog_level=altBuilder_level.create();
                         dialog_level.show();
                         break;
+                    case R.id.set_man_hidden:
+                        //startActivity(new Intent(SettingsActivity.this,HiddenAppActivity.class));
+                        startActivity(new Intent(SettingsActivity.this,HiddenActivity.class));
+                        break;
                 }
             }
         };
 
         btChooseDock.setOnClickListener(tvClicker);
         btSortMech.setOnClickListener(tvClicker);
+        btHidden.setOnClickListener(tvClicker);
         btAppLevel.setOnClickListener(tvClicker);
     }
 }

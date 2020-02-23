@@ -58,10 +58,10 @@ public class FragRight extends Fragment {
             super.handleMessage(msg);
             FragRight fRight=refer.get();
             switch (msg.what){
-                case 0:    //应用安装与卸载、排序
+                case 0:    //应用安装与卸载、隐藏、排序
                     // Log.i("right handler","receive msg 0");
                     fRight.arrAppInfo.clear();
-                    fRight.arrAppInfo.addAll(fRight.lisktopDAO.getAllApps());
+                    fRight.arrAppInfo.addAll(fRight.lisktopDAO.getUnhiddenApps());
                     for (AppInfo app:fRight.arrAppInfo){
                         app.setIs_show_icon(fRight.if_show_icons);
                     }
@@ -97,7 +97,8 @@ public class FragRight extends Fragment {
         lvApps=fRview.findViewById(R.id.installed_apps);
 
         // 获取应用列表
-        arrAppInfo= lisktopDAO.getAllApps();
+        arrAppInfo= lisktopDAO.getUnhiddenApps();
+        Log.i("before hide","num:"+arrAppInfo.size());
         if_show_icons= LisktopApp.getWhetherShowIcon();
         for (AppInfo app:arrAppInfo){
             app.setIs_show_icon(if_show_icons);
@@ -151,14 +152,20 @@ public class FragRight extends Fragment {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
+        String pack_tlong_clicked=arrAppInfo.get(longclickedItem).getPackageName();
         switch (item.getItemId()) {
             case 0:
                 // 添加操作
                 Toast.makeText(getActivity(),"隐藏",Toast.LENGTH_SHORT).show();
+                lisktopDAO.hideApp(pack_tlong_clicked);
+                //arrAppInfo=lisktopDAO.getAllApps();
+                lHandler.sendEmptyMessage(0);
+                Log.i("after hide","num:"+arrAppInfo.size());
+                alAdapter.notifyDataSetChanged();
                 break;
             case 1:
-                String pack_to_uninstall=arrAppInfo.get(longclickedItem).getPackageName();
-                Uri uri = Uri.parse("package:" + pack_to_uninstall);
+
+                Uri uri = Uri.parse("package:" + pack_tlong_clicked);
                 Intent intent = new Intent(Intent.ACTION_DELETE, uri);
                 getActivity().startActivity(intent);
                 break;

@@ -37,7 +37,7 @@ public class AppClickedService extends IntentService {
         String package_name=bd.getString("packName"),application_name=bd.getString("appName");
 
         lisktopDAO=new LisktopDAO(getApplicationContext());
-        ArrayList<AppInfo> appList1=lisktopDAO.getAllApps();
+        ArrayList<AppInfo> appList1=lisktopDAO.getUnhiddenApps();
 
         int clicked_index=lisktopDAO.getRightIndex(package_name,application_name)-1;  //用于排序的下标为ArrayList下标，而数据库中从1开始
 

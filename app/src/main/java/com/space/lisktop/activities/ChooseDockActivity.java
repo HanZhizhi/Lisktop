@@ -35,9 +35,8 @@ import java.util.Comparator;
 public class ChooseDockActivity extends AppCompatActivity  implements View.OnClickListener {
     private ListView lvApps;
     private Button btOK;
-    private ArrayList<AppInfo> apps,selApps=new ArrayList<>();
+    private ArrayList<AppInfo> apps;
     private AppsLvAdapter adapter;
-    private int numSelected=0;
     private LisktopDAO lisktopDAO;
 
     private RecyclerView recSeldApps;
@@ -54,10 +53,6 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
         lisktopDAO=new LisktopDAO(this);
         apps=new PackageManageHelper(this).getStartableApps(true);
 
-        //selApps=lisktopDAO.getDockApps();
-        //Log.i("remove","len-apps:"+apps.size()+",selapps:"+selApps.size());
-        //apps.removeAll(selApps);
-        //Log.i("remove","len-apps:"+apps.size()+",selapps:"+selApps.size());
         initViews();
     }
 
@@ -68,7 +63,7 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
 
         recSeldApps=findViewById(R.id.chsed_apps_recyclerview);
         recSeldApps.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-        chsAdapter=new ChooserAdapter(selApps);
+        chsAdapter=new ChooserAdapter();
         ItemTouchHelper.Callback callback=new ItemTouchHelper.Callback() {
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
@@ -77,8 +72,8 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                Collections.swap(selApps,viewHolder.getAdapterPosition(),target.getAdapterPosition());
-                chsAdapter.notifyItemMoved(viewHolder.getAdapterPosition(),target.getAdapterPosition());
+                int fromPos=viewHolder.getAdapterPosition(),toPos=target.getAdapterPosition();
+                chsAdapter.swapApps(fromPos,toPos);
                 return true;
             }
 
@@ -132,7 +127,7 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
             @Override
             public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 // 操作完毕后恢复颜色
-                viewHolder.itemView.setBackgroundColor(Color.WHITE);
+                viewHolder.itemView.setBackgroundColor(Color.parseColor("#00000000"));
                 viewHolder.itemView.setAlpha(1.0f);
                 //viewHolder.itemView.setScaleX(1.0f);
                 //viewHolder.itemView.setScaleY(1.0f);
@@ -140,14 +135,12 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
             }
         };
         recTouchHelper=new ItemTouchHelper(callback);
+
         recTouchHelper.attachToRecyclerView(recSeldApps);
         chsAdapter.setOnIconClickListener(new ChooserAdapter.IconClickListener() {
             @Override
             public void OnIconClicked(int index) {
-                AppInfo appToDel=selApps.get(index);
-
-                selApps.remove(index);
-                chsAdapter.notifyItemRemoved(index);
+                AppInfo appToDel=chsAdapter.removeApp(index);
 
                 apps.add(appToDel);
                 Collections.sort(apps, new Comparator<AppInfo>() {
@@ -157,8 +150,6 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
                     }
                 });
                 adapter.notifyDataSetChanged();
-
-                numSelected-=1;
             }
         });
         recSeldApps.setAdapter(chsAdapter);
@@ -171,16 +162,13 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
         lvApps.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (numSelected<5)
+                if (chsAdapter.getSelectedNum()<5)
                 {
                     AppInfo ckApp=apps.get(position);
-
-                    selApps.add(ckApp);
-                    chsAdapter.notifyItemInserted(position);
+                    chsAdapter.addApp(ckApp);
 
                     apps.remove(ckApp);
                     adapter.notifyDataSetChanged();
-                    numSelected+=1;
                 }
                 else
                     Toast.makeText(ChooseDockActivity.this,"最多五个哦~", Toast.LENGTH_SHORT).show();
@@ -193,16 +181,14 @@ public class ChooseDockActivity extends AppCompatActivity  implements View.OnCli
         switch (v.getId())
         {
             case R.id.bt_choose_ok:
-                if (numSelected>0)
+                if (0<chsAdapter.getSelectedNum() && chsAdapter.getSelectedNum()<=5)
                 {
                     lisktopDAO.cancelDockApp();
-                    boolean sus=lisktopDAO.writeDockApps(selApps);
-                    Log.i("write","sucsess:"+sus);
+                    boolean sus=lisktopDAO.writeDockApps(chsAdapter.getSelectedApps());
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
                 }
                 else {
-                    //Toast.makeText(this,"请选择主页应用",Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;

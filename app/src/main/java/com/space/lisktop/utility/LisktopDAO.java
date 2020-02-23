@@ -70,14 +70,37 @@ public class LisktopDAO {
     }
 
     //获取右页列表应用按right_index排序
-    public ArrayList<AppInfo> getAllApps(){
+    public ArrayList<AppInfo> getUnhiddenApps(){
+        ArrayList<AppInfo> appList=new ArrayList<>(96);
+        synchronized (dbHelper){
+            if (!database.isOpen())
+            {
+                database=dbHelper.getWritableDatabase();
+            }
+            Cursor cursor=database.query(table_apps,null,"app_hidden=?",new String[]{"0"},null,null,"app_right_index");
+            try {
+                while (cursor.moveToNext()){
+                    appList.add(parseAppInfo(cursor));
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                cursor.close();
+                database.close();
+            }
+        }
+        return appList;
+    }
+
+    //获取已隐藏的应用
+    public ArrayList<AppInfo> getHiddenApps(){
         ArrayList<AppInfo> appList=new ArrayList<>(32);
         synchronized (dbHelper){
             if (!database.isOpen())
             {
                 database=dbHelper.getWritableDatabase();
             }
-            Cursor cursor=database.query(table_apps,null,null,null,null,null,"app_right_index");
+            Cursor cursor=database.query(table_apps,null,"app_hidden=?",new String[]{"1"},null,null,"app_name");
             try {
                 while (cursor.moveToNext()){
                     appList.add(parseAppInfo(cursor));
@@ -203,7 +226,7 @@ public class LisktopDAO {
                 {
                     String dockapp_packageName=selectedApps.get(i).getPackageName();
                     String dockapp_appName=selectedApps.get(i).getAppName();
-                    database.execSQL("update " + table_apps+" set is_dock_app = 1 where package_name = \"" +dockapp_packageName+"\" and app_name =\"" + dockapp_appName +"\"");
+                    database.execSQL("update " + table_apps+" set is_dock_app = "+(i+1)+" where package_name = \"" +dockapp_packageName+"\" and app_name =\"" + dockapp_appName +"\"");
                     Log.i("write finish","dockApp:"+(i+1)+"packName:"+dockapp_packageName);
                 }
                 database.setTransactionSuccessful();
@@ -259,6 +282,44 @@ public class LisktopDAO {
             cursorRightIndex.moveToFirst();
             int rightIndex=cursorRightIndex.getInt(cursorRightIndex.getColumnIndex("app_right_index"));
             return rightIndex;
+        }
+    }
+
+    public void hideApp(String packageName){
+        synchronized (dbHelper){
+            if(!database.isOpen()){
+                database=dbHelper.getWritableDatabase();
+            }
+            database.beginTransaction();
+            try {
+                String hideSql="update "+table_apps+" set app_hidden=1 where package_name=\""+packageName+"\"";
+                database.execSQL(hideSql);
+                database.setTransactionSuccessful();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                database.endTransaction();
+                database.close();
+            }
+        }
+    }
+
+    public void cancelHideApp(String packageName){
+        synchronized (dbHelper){
+            if(!database.isOpen()){
+                database=dbHelper.getWritableDatabase();
+            }
+            database.beginTransaction();
+            try {
+                String hideSql="update "+table_apps+" set app_hidden=0 where package_name=\""+packageName+"\"";
+                database.execSQL(hideSql);
+                database.setTransactionSuccessful();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                database.endTransaction();
+                database.close();
+            }
         }
     }
 
