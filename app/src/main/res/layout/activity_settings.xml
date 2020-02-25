@@ -33,6 +33,16 @@
             android:textSize="18sp"/>
 
         <TextView
+            android:id="@+id/get_Usage_permission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="14dp"
+            android:text="@string/get_usage_stats_permmision"
+            android:textColor="#000000"
+            android:alpha="0.6"
+            android:textSize="18sp"/>
+
+        <TextView
             android:id="@+id/set_sort_mech"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

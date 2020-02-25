@@ -7,11 +7,16 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.ActivityManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,8 +31,12 @@ import com.space.lisktop.activities.FragRight;
 import com.space.lisktop.activities.WelActivity;
 import com.space.lisktop.adapters.launcherPageViewerAdapter;
 import com.space.lisktop.bcastreceiver.HomePressBReceiver;
+import com.space.lisktop.services.UsgStatsService;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class MainActivity extends FragmentActivity {
     private ListView lvPackages;
@@ -84,7 +93,40 @@ public class MainActivity extends FragmentActivity {
         initViews();
 
         pManager=getPackageManager();
+        homeReceiver=new HomePressBReceiver();
+
+        Intent usgIntent =new Intent(this, UsgStatsService.class);
+        startService(usgIntent);
+
+        /*if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            UsageStatsManager usgManager= (UsageStatsManager) getSystemService(this.USAGE_STATS_SERVICE);
+            long time = System.currentTimeMillis();
+            List<UsageStats> stats = usgManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 10, time);
+            if (stats != null) {
+                SortedMap<Long, UsageStats> runningTask = new TreeMap<Long, UsageStats>();
+                for (UsageStats usageStats : stats) {
+                    runningTask.put(usageStats.getLastTimeUsed(), usageStats);
+                }
+                if (runningTask.isEmpty()) {
+                    //continue;
+                }
+                String packagename = runningTask.get(runningTask.lastKey()).getPackageName();
+                Log.i("usage","dayu lollipop: "+packagename);
+            }
+        }
+        else{
+            ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            //4.获取正在开启应用的任务栈
+            List<ActivityManager.RunningTaskInfo> runningTasks = am.getRunningTasks(1);
+            ActivityManager.RunningTaskInfo runningTaskInfo = runningTasks.get(0);
+            //5.获取栈顶的activity,然后在获取此activity所在应用的包名
+            String packagename = runningTaskInfo.topActivity.getPackageName();
+            Log.i("usage","xiaoyu lollipop: "+packagename);
+        }*/
+
     }
+
+
 
     private void initViews()
     {
@@ -133,9 +175,10 @@ public class MainActivity extends FragmentActivity {
     protected void onResume() {
         super.onResume();
 
-        homeReceiver=new HomePressBReceiver();
+
         final IntentFilter homeFilter=new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         registerReceiver(homeReceiver,homeFilter);
+
         Log.i("mainact receiver","reg");
     }
 

@@ -63,6 +63,7 @@ public class TodoAdapter extends RecyclerView.Adapter {
                 }
             });*/
 
+            ((TodoHolder) holder).checkBox.setChecked(false);
             ((TodoHolder) holder).checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

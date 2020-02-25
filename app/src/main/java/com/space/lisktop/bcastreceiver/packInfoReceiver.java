@@ -29,8 +29,10 @@ public class packInfoReceiver extends BroadcastReceiver {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(packAddedIntent);
+                Log.i("packReceiver",">O "+packName);
             }else {
                 context.startService(packAddedIntent);
+                Log.i("packReceiver","<O "+packName);
             }
         }
         if (Intent.ACTION_PACKAGE_REMOVED.equals(action))
@@ -56,7 +58,6 @@ public class packInfoReceiver extends BroadcastReceiver {
             } else {
                 context.startService(packRemovedIntent);
             }
-
             FragRight.lHandler.sendEmptyMessage(0);
         }
         if ("hahaTest".equals(action))

@@ -1,16 +1,25 @@
 package com.space.lisktop.activities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ProcessLifecycleOwnerInitializer;
 import androidx.preference.PreferenceManager;
 
+import android.app.AppOpsManager;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -24,8 +33,9 @@ import com.space.lisktop.R;
 
 public class SettingsActivity extends AppCompatActivity {
     private View.OnClickListener tvClicker;
+    private static final int REQUEST_USAGE_PERMMISION=0;
     private Switch swShowIcon;
-    private TextView btChooseDock,btSortMech,btAppLevel,btHidden;
+    private TextView btChooseDock,btSortMech,btAppLevel,btHidden,btUsagePermmision;
     int selected_method=LisktopApp.getSortMethod();     // 用于记录选择的排序方式
 
     @Override
@@ -56,6 +66,7 @@ public class SettingsActivity extends AppCompatActivity {
         btSortMech=findViewById(R.id.set_sort_mech);
         btAppLevel=findViewById(R.id.set_app_level);
         btHidden=findViewById(R.id.set_man_hidden);
+        btUsagePermmision=findViewById(R.id.get_Usage_permission);
 
         tvClicker=new View.OnClickListener() {
             @Override
@@ -116,6 +127,9 @@ public class SettingsActivity extends AppCompatActivity {
                         //startActivity(new Intent(SettingsActivity.this,HiddenAppActivity.class));
                         startActivity(new Intent(SettingsActivity.this,HiddenActivity.class));
                         break;
+                    case R.id.get_Usage_permission:
+                        Intent usgRqst=new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                        startActivityForResult(usgRqst,REQUEST_USAGE_PERMMISION);
                 }
             }
         };
@@ -124,5 +138,39 @@ public class SettingsActivity extends AppCompatActivity {
         btSortMech.setOnClickListener(tvClicker);
         btHidden.setOnClickListener(tvClicker);
         btAppLevel.setOnClickListener(tvClicker);
+        btUsagePermmision.setOnClickListener(tvClicker);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.setting_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_About:
+                Toast.makeText(SettingsActivity.this,"关于软件",Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode){
+            case REQUEST_USAGE_PERMMISION:
+                AppOpsManager appOps = (AppOpsManager)getSystemService(Context.APP_OPS_SERVICE);
+                int mode = appOps.checkOpNoThrow("android:get_usage_stats",android.os.Process.myUid(), getPackageName());
+                boolean granted = mode == AppOpsManager.MODE_ALLOWED;
+                if (granted)
+                    Toast.makeText(this,"已授予权限！",Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(this,"未授予权限！",Toast.LENGTH_SHORT).show();
+                Log.i("onResult","granted=="+granted);
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

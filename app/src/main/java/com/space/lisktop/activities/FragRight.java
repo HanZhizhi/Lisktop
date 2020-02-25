@@ -86,6 +86,15 @@ public class FragRight extends Fragment {
         packageManager=this.getActivity().getPackageManager();
         lisktopDAO=new LisktopDAO(getActivity());
 
+        piRec=new packInfoReceiver();    //在onCreate中创建防止多次接受多个
+        IntentFilter filter=new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        filter.addAction(Intent.ACTION_PACKAGE_INSTALL);
+        filter.addDataScheme("package");
+        getActivity().registerReceiver(piRec,filter);
+
         lHandler=new ListHandler(this);
     }
 
@@ -177,23 +186,13 @@ public class FragRight extends Fragment {
 
 
     @Override
-    public void onResume() {    // 在onResume和destory中注册、解绑Receiver
-        piRec=new packInfoReceiver();
-        IntentFilter filter=new IntentFilter();
-        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
-        filter.addAction(Intent.ACTION_PACKAGE_INSTALL);
-        filter.addDataScheme("package");
-        getActivity().registerReceiver(piRec,filter);
-        //Log.i("frag right","onresume adn registered");
+    public void onResume() {
         super.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //Log.i("frag right","onpause and do nothing");
     }
 
     @Override

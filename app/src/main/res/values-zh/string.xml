@@ -24,5 +24,7 @@
     <string name="chser_title">选择主页应用</string>
 
     <string name="man_hidden">管理隐藏应用</string>
+    <string name="menu_about">关于</string>
+    <string name="get_usage_stats_permmision">请求使用记录权限</string>
 
 </resources>
