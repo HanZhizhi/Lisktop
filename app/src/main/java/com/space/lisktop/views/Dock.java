@@ -9,21 +9,16 @@ import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.space.lisktop.R;
 import com.space.lisktop.obj.AppInfo;
-import com.space.lisktop.services.AppClickedService;
+import com.space.lisktop.services.AppReorderService;
 
 import java.util.ArrayList;
 
@@ -131,7 +126,7 @@ public class Dock extends LinearLayout implements View.OnClickListener,View.OnTo
                 Intent go=packageManager.getLaunchIntentForPackage(pack);
                 ctx.startActivity(go);
 
-                Intent appClickServiceIntent=new Intent(ctx, AppClickedService.class);
+                Intent appClickServiceIntent=new Intent(ctx, AppReorderService.class);
                 Bundle acBundle=new Bundle();
                 acBundle.putString("packName",pack);       //传入包名称进行后续操作
                 acBundle.putString("appName",app);

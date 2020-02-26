@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.space.lisktop.activities.FragRight;
-import com.space.lisktop.services.AppClickedService;
 import com.space.lisktop.services.PackInfoService;
 
 public class packInfoReceiver extends BroadcastReceiver {

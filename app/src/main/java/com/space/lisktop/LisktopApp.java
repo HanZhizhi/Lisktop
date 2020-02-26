@@ -10,6 +10,14 @@ import androidx.preference.PreferenceManager;
 
 public class LisktopApp extends Application {
     private static SharedPreferences sPref;
+    public static final String LisktopPackageName="com.space.lisktop";
+
+    //startForeground(0, notification);
+    //* @param id The identifier for this notification as per
+    //* {@link NotificationManager#notify(int, Notification)
+    //* NotificationManager.notify(int, Notification)}; !!!!!!!must not be 0  !!!!!!!
+    public static final int FORE_SERVICE_NOTIFICATION_CHANNEL_USG=1;               // 通过使用统计后台排序
+    public static final int FORE_SERVICE_NOTIFICATION_CHANNEL_PACKAGEEVENT=2;      // 监听包安装/卸载
 
     @Override
     public void onCreate() {
@@ -22,7 +30,7 @@ public class LisktopApp extends Application {
         sPref.edit().putBoolean("first_open",b).apply();
     }
 
-    public static boolean getFirstOpen(){
+    public static boolean isFirstOpen(){
         return sPref.getBoolean("first_open",true);
     }
 
@@ -33,6 +41,14 @@ public class LisktopApp extends Application {
 
     public static void setWhetherShowIcon(boolean b){
         sPref.edit().putBoolean("showicon",b).apply();
+    }
+
+    public static void setUsageStasticGranted(boolean b){
+        sPref.edit().putBoolean("usage_stastic_granted",b).apply();
+    }
+
+    public static boolean isUsageStasticGranted(){
+        return sPref.getBoolean("usage_stastic_granted",false);
     }
 
     /*// 设置及获取左页格言

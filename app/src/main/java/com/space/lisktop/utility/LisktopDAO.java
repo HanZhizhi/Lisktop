@@ -272,16 +272,20 @@ public class LisktopDAO {
         }
     }
 
-    public int getRightIndex(String pName_ri,String aName_ri){
+    public int getRightIndex(String pName_ri){    //,String aName_ri
         synchronized (dbHelper){
             if (!database.isOpen()){
                 database=dbHelper.getWritableDatabase();
             }
-            String sqlRightIndex="select app_right_index from "+table_apps+" where package_name=\""+pName_ri+"\" and app_name=\""+aName_ri+"\"";
+            String sqlRightIndex="select app_right_index from "+table_apps+" where package_name=\""+pName_ri+"\"";    // and app_name=\""+aName_ri+"\"";
             Cursor cursorRightIndex=database.rawQuery(sqlRightIndex,null);
             cursorRightIndex.moveToFirst();
-            int rightIndex=cursorRightIndex.getInt(cursorRightIndex.getColumnIndex("app_right_index"));
-            return rightIndex;
+            try {
+                int rightIndex=cursorRightIndex.getInt(cursorRightIndex.getColumnIndex("app_right_index"));
+                return rightIndex;
+            }catch (Exception e){
+                return -1;
+            }
         }
     }
 

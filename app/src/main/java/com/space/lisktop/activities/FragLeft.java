@@ -37,14 +37,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.space.lisktop.views.Dock;
-import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.TodoAdapter;
 import com.space.lisktop.bcastreceiver.TimeReceiver;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.obj.RecyclerDecorator;
-import com.space.lisktop.services.AppClickedService;
+import com.space.lisktop.services.AppReorderService;
 import com.space.lisktop.utility.LisktopDAO;
 
 import java.util.ArrayList;
@@ -363,7 +362,7 @@ public class FragLeft extends Fragment implements View.OnClickListener {
                 Intent go=packMan.getLaunchIntentForPackage(pack);
                 startActivity(go);
 
-                Intent appClickServiceIntent=new Intent(getActivity(), AppClickedService.class);
+                Intent appClickServiceIntent=new Intent(getActivity(), AppReorderService.class);
                 Bundle acBundle=new Bundle();
                 acBundle.putString("packName",pack);       //传入包名称进行后续操作
                 acBundle.putString("appName",app);

@@ -16,6 +16,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
 import com.space.lisktop.activities.FragRight;
 import com.space.lisktop.utility.LisktopDAO;
@@ -52,7 +53,7 @@ public class PackInfoService extends IntentService {
             Notification notification = builder.build(); // 获取构建好的Notification
             notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
 
-            startForeground(1, notification); //这个id不要和应用内的其他通知id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
+            startForeground(LisktopApp.FORE_SERVICE_NOTIFICATION_CHANNEL_PACKAGEEVENT, notification); //这个id不要和应用内的其他通知id一样，不行就写 int.maxValue()        //context.startForeground(SERVICE_ID, builder.getNotification());
         }
     }
 

@@ -91,7 +91,7 @@
             </intent-filter>
         </receiver>
         -->
-        <service android:name=".services.AppClickedService" />
+        <service android:name=".services.AppReorderService" />
         <service
             android:name=".services.PackInfoService"
             android:permission="android.permission.FOREGROUND_SERVICE" />

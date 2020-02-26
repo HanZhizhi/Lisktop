@@ -1,29 +1,20 @@
 package com.space.lisktop;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
-import android.app.ActivityManager;
-import android.app.usage.UsageStats;
-import android.app.usage.UsageStatsManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ListView;
 
 import com.space.lisktop.activities.FragLeft;
@@ -34,9 +25,6 @@ import com.space.lisktop.bcastreceiver.HomePressBReceiver;
 import com.space.lisktop.services.UsgStatsService;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class MainActivity extends FragmentActivity {
     private ListView lvPackages;
@@ -64,7 +52,7 @@ public class MainActivity extends FragmentActivity {
 
         Log.i("mainact","oncreate");
 
-        if (LisktopApp.getFirstOpen()){
+        if (LisktopApp.isFirstOpen()){
             Intent welIntent=new Intent(this, WelActivity.class);
             startActivity(welIntent);
             Log.i("first_open","go to wel");

@@ -164,6 +164,7 @@ public class SettingsActivity extends AppCompatActivity {
                 AppOpsManager appOps = (AppOpsManager)getSystemService(Context.APP_OPS_SERVICE);
                 int mode = appOps.checkOpNoThrow("android:get_usage_stats",android.os.Process.myUid(), getPackageName());
                 boolean granted = mode == AppOpsManager.MODE_ALLOWED;
+                LisktopApp.setUsageStasticGranted(granted);
                 if (granted)
                     Toast.makeText(this,"已授予权限！",Toast.LENGTH_SHORT).show();
                 else

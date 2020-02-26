@@ -27,7 +27,7 @@ import com.space.lisktop.R;
 import com.space.lisktop.adapters.AppsLvAdapter;
 import com.space.lisktop.bcastreceiver.packInfoReceiver;
 import com.space.lisktop.obj.AppInfo;
-import com.space.lisktop.services.AppClickedService;
+import com.space.lisktop.services.AppReorderService;
 import com.space.lisktop.utility.LisktopDAO;
 
 import java.lang.ref.WeakReference;
@@ -133,7 +133,7 @@ public class FragRight extends Fragment {
                 startActivity(intent);
 
                 // 后续Service操作：重排序、数据库、界面响应
-                Intent appClickServiceIntent=new Intent(getActivity(), AppClickedService.class);
+                Intent appClickServiceIntent=new Intent(getActivity(), AppReorderService.class);
                 Bundle acBundle=new Bundle();
                 //acBundle.putInt("click_pos",position);
                 acBundle.putString("packName",packName);       //传入包名称进行后续操作
