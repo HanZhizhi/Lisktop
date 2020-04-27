@@ -3,6 +3,7 @@ package com.space.lisktop.activities;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,9 +27,11 @@ import android.os.SystemClock;
 import android.provider.AlarmClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +39,7 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.space.lisktop.views.BottomInput;
 import com.space.lisktop.views.Dock;
 import com.space.lisktop.R;
 import com.space.lisktop.adapters.TodoAdapter;
@@ -45,12 +49,13 @@ import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.obj.RecyclerDecorator;
 import com.space.lisktop.services.AppReorderService;
 import com.space.lisktop.utility.LisktopDAO;
+import com.space.lisktop.views.TodoAdder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class FragLeft extends Fragment implements View.OnClickListener {
+public class FragLeft extends Fragment implements View.OnClickListener, TodoAdder.AddListener{
     private Context context;
     private TextView tvSettings;
     private TextClock tcTime;
@@ -71,6 +76,8 @@ public class FragLeft extends Fragment implements View.OnClickListener {
     private ArrayList<String> todoList;
 
     private TextView tvAddTodo;
+
+    private String todoFromDialog;    //接受从dialogfragment返回的代办字符串
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -289,6 +296,11 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         super.onResume();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+    }
+
     private void addMainApp(ArrayList<AppInfo> infoList)
     {
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -333,26 +345,18 @@ public class FragLeft extends Fragment implements View.OnClickListener {
                 startActivity(itClock);
                 break;
             case R.id.todo_add:
-                //AlertDialog
-                final EditText etv=new EditText(getActivity());
-                etv.setText("");
-                AlertDialog.Builder adbuilder=new AlertDialog.Builder(getActivity());
-                adbuilder.setTitle(R.string.todo_prompt).setView(etv)
-                        .setPositiveButton(R.string.dialog_positive, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String todoInfo=etv.getText().toString();
-                                if(todoList.contains(todoInfo)){
-                                    Toast.makeText(getActivity(),"待办已存在！",Toast.LENGTH_SHORT).show();
-                                }
-                                else{
-                                    tdAdapter.addNewItem(todoInfo);
-                                    lisktopDAO.insertTodo(todoInfo);
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.dialog_negative,null);
-                adbuilder.create().show();
+                /*Dialog bottomInput=new Dialog(getActivity());
+                bottomInput.setContentView(R.layout.todo_adder);
+                WindowManager.LayoutParams lp=bottomInput.getWindow().getAttributes();
+                lp.gravity= Gravity.BOTTOM;
+                lp.height= WindowManager.LayoutParams.WRAP_CONTENT;
+                lp.width= WindowManager.LayoutParams.MATCH_PARENT;
+                bottomInput.getWindow().setAttributes(lp);
+                bottomInput.show();*/
+                TodoAdder adderDialog=new TodoAdder();
+                adderDialog.setTargetFragment(this,11);
+                adderDialog.show(getFragmentManager(),"AddTodo");
+
                 tdLayouter.scrollToPosition(0);
                 break;
             default:     // 点击dock应用：启动，service。
@@ -378,5 +382,10 @@ public class FragLeft extends Fragment implements View.OnClickListener {
         if (timeChangeReceiver!=null){
             context.unregisterReceiver(timeChangeReceiver);
         }
+    }
+
+    @Override
+    public void onAddBtnClicked(String todo_text) {
+        tdAdapter.addNewItem(todo_text);
     }
 }

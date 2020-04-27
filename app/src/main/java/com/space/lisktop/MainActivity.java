@@ -6,17 +6,24 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ListView;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.space.lisktop.activities.FragLeft;
 import com.space.lisktop.activities.FragRight;
 import com.space.lisktop.activities.WelActivity;
@@ -25,6 +32,10 @@ import com.space.lisktop.bcastreceiver.HomePressBReceiver;
 import com.space.lisktop.services.UsgStatsService;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 public class MainActivity extends FragmentActivity {
     private ListView lvPackages;
@@ -35,6 +46,8 @@ public class MainActivity extends FragmentActivity {
     private launcherPageViewerAdapter pgAdapter;
     private ViewPager pager;
     private FragmentManager fragManager;
+
+    private Button usage;
 
     public static Handler mainHandler;
     private HomePressBReceiver homeReceiver=null;
@@ -52,6 +65,13 @@ public class MainActivity extends FragmentActivity {
 
         Log.i("mainact","oncreate");
 
+        ImmersionBar.with(this)
+                .statusBarColor(R.color.color_status_bar)
+                .navigationBarColor(R.color.dock_bg)
+                .fitsSystemWindows(true)
+                .autoDarkModeEnable(true)
+                .init();
+
         if (LisktopApp.isFirstOpen()){
             Intent welIntent=new Intent(this, WelActivity.class);
             startActivity(welIntent);
@@ -66,11 +86,11 @@ public class MainActivity extends FragmentActivity {
                 switch (msg.what){
                     case 0:           //0:来自homepressreceiver，点击home键后返回左页面
                         Log.i("mainact","receive homeclick message");
-                        pager.setCurrentItem(0,false);
+                        pager.setCurrentItem(0,true);
                         break;
                     case 1:           //来自APPclickreceiver，
                         Log.i("mainact","receive APPclick message");
-                        pager.setCurrentItem(0,false);
+                        pager.setCurrentItem(0,true);
                         break;
                 }
             }
@@ -112,9 +132,43 @@ public class MainActivity extends FragmentActivity {
             Log.i("usage","xiaoyu lollipop: "+packagename);
         }*/
 
+        usage=findViewById(R.id.usage);
+        usage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testStates();
+            }
+        });
+        testStates();
     }
 
+    private void testStates(){
+        long curTime=System.currentTimeMillis();
+        Calendar c=Calendar.getInstance();
+        c.set(2020,3,26,0,0,0);
+        //c.setTime(new Date());
+        //l/ong endt=c.getTimeInMillis();
 
+        //long startt=c.getTimeInMillis();
+
+        Calendar c1=Calendar.getInstance();
+        c1.set(2020,3,26,16,25,0);
+
+        Calendar firstStamp=Calendar.getInstance(), lastUseTime=Calendar.getInstance();
+        firstStamp.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            UsageStatsManager usageStatsManager= (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+            List<UsageStats> list=usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_BEST,c.getTimeInMillis(),c1.getTimeInMillis());
+            Log.i("statesAct", "onCreate: "+list.size()+"  "+c.getTimeInMillis());
+            for (UsageStats st:list){
+                firstStamp.setTimeInMillis(st.getFirstTimeStamp());
+                lastUseTime.setTimeInMillis(st.getLastTimeUsed());
+                Log.i("statesAct", "onCreate: "+st.getPackageName()+",last time used:"+lastUseTime.getTime()+
+                        ",total foreground:"+st.getTotalTimeInForeground()/1000+"秒, first stamp:"+firstStamp.getTime()+",luanch count:");
+            }
+        }
+    }
 
     private void initViews()
     {

@@ -114,6 +114,6 @@
         android:layout_height="wrap_content"
         app:iconPaddingTop="8dp"
         app:dockIconSize="60dp"
-        app:dockBacgroundColor="#eeeeee"/>
+        app:dockBacgroundColor="@color/dock_bg"/>
 
 </LinearLayout>

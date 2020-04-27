@@ -84,8 +84,8 @@ public class UsgStatsService extends Service {
             if (usageStatsList != null && !usageStatsList.isEmpty()) {
                 SortedMap<Long, UsageStats> usageStatsMap = new TreeMap<>();
                 for (UsageStats usageStats : usageStatsList) {
-                    if(LisktopApp.LisktopPackageName.equals(usageStats.getPackageName()))
-                        continue;
+                    Log.i(TAG, "getTopApp: package"+getPackageName());
+                    if(getPackageName().equals(usageStats.getPackageName())) continue;
                     usageStatsMap.put(usageStats.getLastTimeUsed(), usageStats);
                 }
 

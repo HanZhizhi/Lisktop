@@ -16,6 +16,9 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.space.lisktop.R;
 import com.space.lisktop.obj.AppInfo;
 import com.space.lisktop.services.AppReorderService;
@@ -93,7 +96,10 @@ public class Dock extends LinearLayout implements View.OnClickListener,View.OnTo
                 params1.rightMargin=sideMargin+pads;
 
             ImageView iv=new ImageView(ctx);
-            iv.setImageDrawable(apps.get(i).getAppIcon());
+            //iv.setImageDrawable(apps.get(i).getAppIcon());
+            //RoundedCorners roundCorner=new RoundedCorners(6);
+            //RequestOptions options= RequestOptions.bitmapTransform(roundCorner).override(300, 300);
+            Glide.with(getContext()).load(apps.get(i).getAppIcon()).into(iv);     //.apply(options)
 
             iv.setTag(i);
             iv.setOnClickListener(this);

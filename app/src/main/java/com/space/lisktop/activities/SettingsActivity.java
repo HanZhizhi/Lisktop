@@ -28,6 +28,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.space.lisktop.LisktopApp;
 import com.space.lisktop.R;
 
@@ -42,6 +43,13 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        ImmersionBar.with(this)
+                .statusBarColor(R.color.color_status_bar)
+                .navigationBarColor(R.color.color_status_bar)
+                .fitsSystemWindows(true)
+                .autoDarkModeEnable(true)
+                .init();
 
         initViews();
     }

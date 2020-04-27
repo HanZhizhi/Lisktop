@@ -32,6 +32,7 @@ import com.space.lisktop.utility.LisktopDAO;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class FragRight extends Fragment {
     private PackageManager packageManager;

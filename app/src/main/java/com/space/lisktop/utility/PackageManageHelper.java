@@ -19,9 +19,11 @@ import java.util.List;
 
 public class PackageManageHelper {
     private PackageManager packMan;
+    private Context context;
 
     public PackageManageHelper(Context context)
     {
+        this.context=context;
         this.packMan=context.getPackageManager();
     }
 
@@ -36,13 +38,12 @@ public class PackageManageHelper {
 
         for(ResolveInfo ri:startApps)
         {
-
             String namea=ri.loadLabel(packMan).toString();
             String namepack=ri.activityInfo.packageName;
             Drawable icona=ri.loadIcon(packMan);
             AppInfo aIn=new AppInfo(namea,namepack,icona);
-            if(! "com.space.lisktop".equals(namepack))
-                launcherApps.add(aIn);
+            if(context.getPackageName().equals(namepack)) continue;
+            launcherApps.add(aIn);
         }
 
         if (sortAppsByName)

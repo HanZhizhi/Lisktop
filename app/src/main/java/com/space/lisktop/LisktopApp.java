@@ -10,7 +10,7 @@ import androidx.preference.PreferenceManager;
 
 public class LisktopApp extends Application {
     private static SharedPreferences sPref;
-    public static final String LisktopPackageName="com.space.lisktop";
+    public static final String LisktopPackageName1="com.space.lisktop";
 
     //startForeground(0, notification);
     //* @param id The identifier for this notification as per
@@ -23,6 +23,7 @@ public class LisktopApp extends Application {
     public void onCreate() {
         super.onCreate();
         sPref= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Log.i("packagename", "onCreate: "+getPackageName());
     }
 
     // 是否初次打开（显示介绍，及选择dock应用）
