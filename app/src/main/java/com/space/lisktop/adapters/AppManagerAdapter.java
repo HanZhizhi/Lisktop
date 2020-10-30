@@ -68,6 +68,11 @@ public class AppManagerAdapter extends RecyclerView.Adapter implements LeftSlide
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
+    @Override
     public void OnMenuOpened(View view) {
         mSlideMenu = (LeftSlideView) view;
     }

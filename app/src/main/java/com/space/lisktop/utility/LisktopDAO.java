@@ -149,9 +149,18 @@ public class LisktopDAO {
                 database = dbHelper.getWritableDatabase();
             }
             for(int i=0;i<userApps.size();i++){
-                ContentValues value=new ContentValues();
+
+
                 AppInfo appInfo=userApps.get(i);
-                value.put("package_name",appInfo.getPackageName());
+                String nameOfPackage=appInfo.getPackageName();
+
+                if(context.getPackageName().equals(nameOfPackage)){
+                    Log.i("writeJump", "跳过本包"+nameOfPackage);
+                    continue;
+                }
+
+                ContentValues value=new ContentValues();
+                value.put("package_name",nameOfPackage);
                 value.put("app_name",appInfo.getAppName());
 
                 //drawable转为bitmap使用字节输出流
@@ -254,6 +263,11 @@ public class LisktopDAO {
                 for (int i=0;i<apps.size();i++)
                 {
                     String packageName=apps.get(i).getPackageName(),appName=apps.get(i).getAppName();
+                    if(context.getPackageName().equals(packageName)){
+                        Log.i("reOrderJump", "跳过本包"+packageName);
+                        continue;
+                    }
+
                     int app_index= i+1; //apps.get(i).getRight_index();
                     String sqlUpdate="update "+table_apps+" set app_right_index ="+app_index +" where package_name= \""+packageName+"\" and app_name =\"" + appName +"\"";
                     database.execSQL(sqlUpdate);

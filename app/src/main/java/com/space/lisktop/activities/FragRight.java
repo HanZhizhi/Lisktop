@@ -174,7 +174,6 @@ public class FragRight extends Fragment {
                 alAdapter.notifyDataSetChanged();
                 break;
             case 1:
-
                 Uri uri = Uri.parse("package:" + pack_tlong_clicked);
                 Intent intent = new Intent(Intent.ACTION_DELETE, uri);
                 getActivity().startActivity(intent);

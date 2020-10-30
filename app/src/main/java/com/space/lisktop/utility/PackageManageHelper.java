@@ -42,7 +42,7 @@ public class PackageManageHelper {
             String namepack=ri.activityInfo.packageName;
             Drawable icona=ri.loadIcon(packMan);
             AppInfo aIn=new AppInfo(namea,namepack,icona);
-            if(context.getPackageName().equals(namepack)) continue;
+
             launcherApps.add(aIn);
         }
 

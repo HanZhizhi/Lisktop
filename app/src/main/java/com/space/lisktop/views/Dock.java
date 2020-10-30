@@ -67,7 +67,7 @@ public class Dock extends LinearLayout implements View.OnClickListener,View.OnTo
         iconPadTop=(int)ta.getDimension(R.styleable.Dock_iconPaddingTop,dp2px(context,15));     //图标与上下边距，默认15
         //setPadding(iconPadTop*2,iconPadTop,iconPadTop*2,iconPadTop);
 
-        dockHeight=iconSize; //添加图标时设置了padTop，故此处不需要  //(int)ta.getDimension(R.styleable.Dock_dockHeight,dp2px(context,100));
+        dockHeight = iconSize; //添加图标时设置了padTop，故此处不需要  //(int)ta.getDimension(R.styleable.Dock_dockHeight,dp2px(context,100));
         dockBgColor=ta.getColor(R.styleable.Dock_dockBacgroundColor, Color.parseColor("#f8f8f8"));
 
         Log.i("dock","height:"+dockHeight+",width:"+dockWidth);

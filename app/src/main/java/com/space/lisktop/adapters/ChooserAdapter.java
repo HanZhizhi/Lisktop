@@ -15,11 +15,11 @@ import com.space.lisktop.obj.AppInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class ChooserAdapter extends RecyclerView.Adapter {
+public class ChooserAdapter extends RecyclerView.Adapter<ChooserAdapter.SelHolder> {
     private ArrayList<AppInfo> selectedApps;
     private IconClickListener iconClickListener;
 
-    class SelHolder extends RecyclerView.ViewHolder{
+    static class SelHolder extends RecyclerView.ViewHolder{
         ImageView appIcon;
 
         public SelHolder(@NonNull View itemView) {
@@ -34,35 +34,33 @@ public class ChooserAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SelHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.choosed_app_layout,parent,false);
-        SelHolder vHolder=new SelHolder(view);
-        return vHolder;
+        return new SelHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull SelHolder holder, final int position) {
+        ((SelHolder) holder).appIcon.setImageDrawable(selectedApps.get(position).getAppIcon());
+        ((SelHolder) holder).appIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("onBind","pos:"+position);
+                if(iconClickListener!=null){
+                    iconClickListener.OnIconClicked(position);
+                }
+            }
+        });
     }
 
     public void setOnIconClickListener(IconClickListener listener) {
         this.iconClickListener = listener;
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-        if(holder instanceof SelHolder){
-            ((SelHolder) holder).appIcon.setImageDrawable(selectedApps.get(position).getAppIcon());
-            ((SelHolder) holder).appIcon.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("onBind","pos:"+position);
-                    if(iconClickListener!=null){
-                        iconClickListener.OnIconClicked(position);
-                    }
-                }
-            });
-        }
-    }
 
     @Override
     public int getItemCount() {
-        return selectedApps.size()==0?0:selectedApps.size();
+        return selectedApps.size();
     }
 
     public interface IconClickListener{

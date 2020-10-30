@@ -45,7 +45,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         ImmersionBar.with(this)
-                .statusBarColor(R.color.color_status_bar)
+                .statusBarColor(R.color.colorPrimaryDark)
                 .navigationBarColor(R.color.color_status_bar)
                 .fitsSystemWindows(true)
                 .autoDarkModeEnable(true)
