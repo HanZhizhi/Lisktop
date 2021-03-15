@@ -64,7 +64,7 @@ public class ChooserAdapter extends RecyclerView.Adapter<ChooserAdapter.SelHolde
     }
 
     public interface IconClickListener{
-        public void OnIconClicked(int index);
+        void OnIconClicked(int index);
     }
 
     public void addApp(AppInfo app){
